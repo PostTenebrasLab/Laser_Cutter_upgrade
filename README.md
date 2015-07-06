@@ -45,3 +45,6 @@ This project aims to improve a cheap Chinese 40W laser cutter, by making it easi
 
  * http://3dprintzothar.blogspot.ca/2014/08/40-watt-chinese-co2-laser-upgrade-with.html
  * http://www.lightobject.com/Power-table-bed-kit-for-K40-small-laser-machine-P722.aspx
+
+ Marlin on arduino Due (3d printer)
+ * https://github.com/bobc/Marlin
