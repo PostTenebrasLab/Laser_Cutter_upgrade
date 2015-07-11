@@ -31,6 +31,9 @@ void timer3_init(int pin) {
 	pinMode(pin, OUTPUT);
     analogWrite(pin, 1);  // let Arduino setup do it's thing to the PWM pin
 
+   /*
+    *  Need to change timer for Due
+    *
     TCCR3B = 0x00;  // stop Timer4 clock for register updates
     TCCR3A = 0x82; // Clear OC3A on match, fast PWM mode, lower WGM3x=14
     ICR3 = labs(F_CPU / LASER_PWM); // clock cycles per PWM pulse
@@ -43,12 +46,16 @@ void timer3_init(int pin) {
     ICR3 = labs(F_CPU / LASER_PWM); // set new PWM period
     TCCR3B |= 0x01; // start the timer with proper prescaler value
     interrupts();
+    */
 }
 
 void timer4_init(int pin) {
 	pinMode(pin, OUTPUT);
     analogWrite(pin, 1);  // let Arduino setup do it's thing to the PWM pin
 
+    /*
+     *
+     *
     TCCR4B = 0x00;  // stop Timer4 clock for register updates
     TCCR4A = 0x82; // Clear OC4A on match, fast PWM mode, lower WGM4x=14
     ICR4 = labs(F_CPU / LASER_PWM); // clock cycles per PWM pulse
@@ -61,6 +68,7 @@ void timer4_init(int pin) {
     ICR4 = labs(F_CPU / LASER_PWM); // set new PWM period
     TCCR4B |= 0x01; // start the timer with proper prescaler value
     interrupts();
+     */
 }
 
 void laser_init()
