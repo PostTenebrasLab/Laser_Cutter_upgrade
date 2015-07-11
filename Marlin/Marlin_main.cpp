@@ -57,6 +57,10 @@
 #include "Servo.h"
 #endif
 
+#ifdef LASER_RASTER
+#include "Base64.h"
+#endif /* LASER_RASTER */
+
 #if defined(DIGIPOTSS_PIN) && DIGIPOTSS_PIN > -1
 #include <SPI.h>
 #endif
@@ -73,6 +77,7 @@
 // G2  - CW ARC
 // G3  - CCW ARC
 // G4  - Dwell S<seconds> or P<milliseconds>
+// G7  - Execute raster line
 // G10 - retract filament according to settings of M207
 // G11 - retract recover filament according to settings of M208
 // G28 - Home all Axis
@@ -514,6 +519,10 @@ void setup()
   #ifdef DIGIPOT_I2C
     digipot_i2c_init();
   #endif
+  #ifdef LASER
+  laser_init();
+  #endif
+
 }
 
 
