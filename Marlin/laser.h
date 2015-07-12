@@ -56,6 +56,7 @@ typedef struct {
 
 extern laser_t laser;
 
+// TODO create
 void laser_init();
 void laser_fire(int intensity);
 void laser_extinguish();
