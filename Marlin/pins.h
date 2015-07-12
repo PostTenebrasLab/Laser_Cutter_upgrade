@@ -39,23 +39,23 @@
 
 // TODO assign PIN for FAN, ()_MAX_PIN,...
 
-#define X_STEP_PIN         63
-#define X_DIR_PIN          62
+#define X_STEP_PIN         63   // AD9
+#define X_DIR_PIN          62   // AD8
 #define X_ENABLE_PIN       48
 #define X_MIN_PIN          22
-#define X_MAX_PIN           -1   //2 //Max endstops default to disabled "-1", set to commented value to enable.
+#define X_MAX_PIN          30
 
-#define Y_STEP_PIN         65
-#define Y_DIR_PIN          64
+#define Y_STEP_PIN         65   // AD11
+#define Y_DIR_PIN          64   // AD10
 #define Y_ENABLE_PIN       46
 #define Y_MIN_PIN          24
-#define Y_MAX_PIN          -1   //15
+#define Y_MAX_PIN          38
 
-#define Z_STEP_PIN         67
-#define Z_DIR_PIN          66
+#define Z_STEP_PIN         67   // AD13
+#define Z_DIR_PIN          66   // AD12
 #define Z_ENABLE_PIN       44
 #define Z_MIN_PIN          26
-#define Z_MAX_PIN          -1
+#define Z_MAX_PIN          34
 
 #define E0_STEP_PIN        36
 #define E0_DIR_PIN         28
@@ -82,67 +82,63 @@
 #define PS_ON_PIN          -1
 
 #define KILL_PIN           -1
+#define EMERGENCY_STOP     40   // emergency stop IN
+
+#define HEATER_BED_PIN     8    // FET1 Heatbed
+
+#define HEATER_0_PIN       9    // FET2 E1/Fan
+#define HEATER_1_PIN       10   // FET3 E2/Fan
+#define HEATER_2_PIN       11   // FET4 E3/Fan
+#define HEATER_3_PIN       12   // FET5 extra MOSFET
+#define HEATER_4_PIN       2    // FET6 extra MOSFET
+
+// TODO check 4 thermo numbers AD0-AD3
+// #define TEMP_BED_PIN       0   // AD0 ANALOG NUMBERING
+#define TEMP_0_PIN         -1  // AD0 ANALOG NUMBERING
+#define TEMP_1_PIN         -1  // AD1 ANALOG NUMBERING
+#define TEMP_2_PIN         -1  // AD2 ANALOG NUMBERING
+#define TEMP_3_PIN         -1  // AD3 ANALOG NUMBERING
 
 
-#define HEATER_BED_PIN     8    // BED
-
-#define HEATER_0_PIN       9
-#define HEATER_1_PIN       10
-#define HEATER_2_PIN       11
-
-#define TEMP_BED_PIN       0   // ANALOG NUMBERING
-
-#define TEMP_0_PIN         1   // ANALOG NUMBERING
-#define TEMP_1_PIN         -1  // 2    // ANALOG NUMBERING
-#define TEMP_2_PIN         -1  // 3     // ANALOG NUMBERING
-
-#define TEMP_3_PIN         -1   // ANALOG NUMBERING
-#define TEMP_4_PIN         -1   // ANALOG NUMBERING
-
-
-// TODO choose a pin for Due + RAMPS-FD
+// TODO choose Laser pins for Due + RAMPS-FD
 #if LASER_CONTROL == 1
-#define LASER_FIRING_PIN    5
+#define LASER_FIRING_PIN   5
 #endif
 
 #if LASER_CONTROL == 2
 #define LASER_INTENSITY_PIN 5 // Digital pins 2, 3, 5, 6, 7, 8 are attached to timers we can use
-#define LASER_FIRING_PIN	2
+#define LASER_FIRING_PIN	2 // D2 is a MOSFET
 #endif
 
 #ifdef NUM_SERVOS
-#define SERVO0_PIN       11
-
+#define SERVO0_PIN         7  // SERVO1
 #if NUM_SERVOS > 1
-#define SERVO1_PIN     6
+#define SERVO1_PIN         6  // SERVO2
 #endif
-
 #if NUM_SERVOS > 2
-#define SERVO2_PIN     5
+#define SERVO2_PIN         5  // SERVO3
 #endif
-
 #if NUM_SERVOS > 3
-#define SERVO3_PIN     4
+#define SERVO3_PIN         4  // SERVO4
 #endif
 #endif /* NUM_SERVO */
 
 #ifdef ULTRA_LCD
-
 #ifdef NEWPANEL
 // ramps-fd lcd adaptor
-#define LCD_PINS_RS   16
-#define LCD_PINS_ENABLE 17
-#define LCD_PINS_D4   23
-#define LCD_PINS_D5   25
-#define LCD_PINS_D6   27
-#define LCD_PINS_D7   29
+#define LCD_PINS_RS       16
+#define LCD_PINS_ENABLE   17
+#define LCD_PINS_D4       23
+#define LCD_PINS_D5       25
+#define LCD_PINS_D6       27
+#define LCD_PINS_D7       29
 
 #ifdef REPRAP_DISCOUNT_SMART_CONTROLLER
-#define BEEPER      37
-#define BTN_EN1     33
-#define BTN_EN2     31
-#define BTN_ENC     35
-#define SDCARDDETECT 49
+#define BEEPER            37
+#define BTN_EN1           33
+#define BTN_EN2           31
+#define BTN_ENC           35
+#define SDCARDDETECT      49
 #endif
 
 #endif /* NEWPANEL */
@@ -150,12 +146,12 @@
 
 #ifndef SDSUPPORT
 // these pins are defined in the SD library if building with SD support
-#define MAX_SCK_PIN     52
-#define MAX_MISO_PIN    50
-#define MAX_MOSI_PIN    51
-#define MAX6675_SS      53
+#define MAX_SCK_PIN       52
+#define MAX_MISO_PIN      50
+#define MAX_MOSI_PIN      51
+#define MAX6675_SS        53
 #else
-#define MAX6675_SS      49
+#define MAX6675_SS        49
 #endif /* SDSUPPORT */
 
 #endif /* MOTHERBOARD == 403, 404 */
