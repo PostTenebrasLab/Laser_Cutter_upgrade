@@ -1174,6 +1174,29 @@ void process_commands()
               }
             }
           #endif //FWRETRACT
+
+        #ifdef LASER_FIRE_G1
+        if (code_seen('S') && !IsStopped()) laser.intensity = (float) code_value();
+        if (code_seen('L') && !IsStopped()) laser.duration = (unsigned long) labs(code_value());
+        if (code_seen('P') && !IsStopped()) laser.ppm = (float) code_value();
+        if (code_seen('D') && !IsStopped()) laser.diagnostics = (bool) code_value();
+        if (code_seen('B') && !IsStopped()) laser_set_mode((laser_e) code_value());
+
+        laser.status = LASER_ON;
+        laser.fired = LASER_FIRE_G1;
+        #endif // LASER_FIRE_G1
+        #ifdef FWRETRACT
+        if(autoretract_enabled)
+        if( !(code_seen('X') || code_seen('Y') || code_seen('Z')) && code_seen('E')) {
+          float echange=destination[E_AXIS]-current_position[E_AXIS];
+          if((echange<-MIN_RETRACT && !retracted) || (echange>MIN_RETRACT && retracted)) { //move appears to be an attempt to retract or recover
+            current_position[E_AXIS] = destination[E_AXIS]; //hide the slicer-generated retract/recover from calculations
+            plan_set_e_position(current_position[E_AXIS]); //AND from the planner
+            retract(!retracted);
+            return;
+          }
+        }
+        #endif //FWRETRACT
         prepare_move();
         //ClearToSend();
         return;
@@ -1182,6 +1205,18 @@ void process_commands()
     case 2: // G2  - CW ARC
       if(Stopped == false) {
         get_arc_coordinates();
+
+        #ifdef LASER_FIRE_G1
+          if (code_seen('S') && !IsStopped()) laser.intensity = (float) code_value();
+          if (code_seen('L') && !IsStopped()) laser.duration = (unsigned long) labs(code_value());
+          if (code_seen('P') && !IsStopped()) laser.ppm = (float) code_value();
+          if (code_seen('D') && !IsStopped()) laser.diagnostics = (bool) code_value();
+          if (code_seen('B') && !IsStopped()) laser_set_mode((laser_e) code_value());
+
+          laser.status = LASER_ON;
+          laser.fired = LASER_FIRE_G1;
+        #endif // LASER_FIRE_G1
+
         prepare_arc_move(true);
         return;
       }
@@ -1189,6 +1224,18 @@ void process_commands()
     case 3: // G3  - CCW ARC
       if(Stopped == false) {
         get_arc_coordinates();
+
+        #ifdef LASER_FIRE_G1
+          if (code_seen('S') && !IsStopped()) laser.intensity = (float) code_value();
+          if (code_seen('L') && !IsStopped()) laser.duration = (unsigned long) labs(code_value());
+          if (code_seen('P') && !IsStopped()) laser.ppm = (float) code_value();
+          if (code_seen('D') && !IsStopped()) laser.diagnostics = (bool) code_value();
+          if (code_seen('B') && !IsStopped()) laser_set_mode((laser_e) code_value());
+
+          laser.status = LASER_ON;
+          laser.fired = LASER_FIRE_G1;
+        #endif // LASER_FIRE_G1
+
         prepare_arc_move(false);
         return;
       }
@@ -1660,6 +1707,26 @@ void process_commands()
     }
     break;
 #endif
+#ifdef LASER_FIRE_SPINDLE
+    case 3:  //M3 - fire laser
+      if (code_seen('S') && !IsStopped()) laser.intensity = (float) code_value();
+      if (code_seen('L') && !IsStopped()) laser.duration = (unsigned long) labs(code_value());
+      if (code_seen('P') && !IsStopped()) laser.ppm = (float) code_value();
+      if (code_seen('D') && !IsStopped()) laser.diagnostics = (bool) code_value();
+      if (code_seen('B') && !IsStopped()) laser_set_mode((laser_e) code_value());
+
+      laser.status = LASER_ON;
+      laser.fired = LASER_FIRE_SPINDLE;
+      //lcd_update();
+
+      prepare_move();
+      break;
+    case 5:  //M5 stop firing laser
+	  laser.status = LASER_OFF;
+          lcd_update();
+	  prepare_move();
+      break;
+#endif // LASER_FIRE_SPINDLE
     case 17:
         LCD_MESSAGEPGM(MSG_NO_MOVE);
         enable_x();
@@ -2948,6 +3015,71 @@ void process_commands()
     }
     break;
     #endif //DUAL_X_CARRIAGE
+	#ifdef LASER
+	case 649: // M649 set laser options
+	{
+	  if (code_seen('S') && !IsStopped()) {
+          laser.intensity = (float) code_value();
+          laser.rasterlaserpower =  laser.intensity;
+      }
+      if (code_seen('L') && !IsStopped()) laser.duration = (unsigned long) labs(code_value());
+      if (code_seen('P') && !IsStopped()) laser.ppm = (float) code_value();
+      if (code_seen('D') && !IsStopped()) laser.diagnostics = (bool) code_value();
+      if (code_seen('B') && !IsStopped()) laser_set_mode((laser_e) code_value());
+      if (code_seen('R') && !IsStopped()) laser.raster_mm_per_pulse = ((float) code_value());
+      if (code_seen('F')) {
+        next_feedrate = code_value();
+        if(next_feedrate > 0.0) feedrate = next_feedrate;
+      }
+
+	}
+	break;
+	#endif // LASER
+
+    #ifdef MUVE_Z_PEEL
+    case 650: // M650 set peel distance
+    {
+      st_synchronize();
+      if(code_seen('D')){
+		laser.peel_distance = (float) code_value();
+      } else {
+        laser.peel_distance=2.0;
+      }
+      if(code_seen('S')){
+		laser.peel_speed = (float) code_value();
+      } else {
+        laser.peel_speed=2.0;
+      }
+      if(code_seen('P')){
+		laser.peel_pause = (float) code_value();
+      } else {
+        laser.peel_pause=0.0;
+      }
+    }
+    break;
+
+    case 651: // M651 run peel move
+    {
+      if(laser.peel_distance > 0);
+        plan_buffer_line(destination[X_AXIS], destination[Y_AXIS], destination[Z_AXIS] + laser.peel_distance, destination[Z_AXIS], laser.peel_speed, active_extruder);
+        plan_buffer_line(destination[X_AXIS], destination[Y_AXIS], destination[Z_AXIS] + laser.peel_distance, destination[Z_AXIS] + laser.peel_distance, laser.peel_speed, active_extruder);
+        st_synchronize();
+      if(laser.peel_pause > 0);
+        st_synchronize();
+        codenum = laser.peel_pause;
+        codenum += millis();  // keep track of when we started waiting
+        previous_millis_cmd = millis();
+        while(millis()  < codenum ){
+        manage_heater();
+        manage_inactivity();
+        lcd_update();
+      }
+
+        plan_buffer_line(destination[X_AXIS], destination[Y_AXIS], destination[Z_AXIS], destination[Z_AXIS], 30, active_extruder);
+        st_synchronize();
+    }
+    break;
+    #endif // MUVE_Z_PEEL
 
     case 907: // M907 Set digital trimpot motor current using axis codes.
     {

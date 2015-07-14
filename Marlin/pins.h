@@ -90,14 +90,12 @@
 #define HEATER_1_PIN       10
 #define HEATER_2_PIN       11
 
-#define TEMP_BED_PIN       0   // ANALOG NUMBERING
-
-#define TEMP_0_PIN         1   // ANALOG NUMBERING
-#define TEMP_1_PIN         -1  // 2    // ANALOG NUMBERING
-#define TEMP_2_PIN         -1  // 3     // ANALOG NUMBERING
-
-#define TEMP_3_PIN         -1   // ANALOG NUMBERING
-#define TEMP_4_PIN         -1   // ANALOG NUMBERING
+// TODO check 4 thermo numbers AD0-AD3
+#define TEMP_BED_PIN       54  // AD0 ANALOG NUMBERING AD0 = 54 = PA16(SAM3X)
+#define TEMP_0_PIN         54  // AD0 ANALOG NUMBERING
+#define TEMP_1_PIN         55  // AD1 ANALOG NUMBERING
+#define TEMP_2_PIN         56  // AD2 ANALOG NUMBERING
+#define TEMP_3_PIN         57  // AD3 ANALOG NUMBERING
 
 
 // TODO choose a pin for Due + RAMPS-FD

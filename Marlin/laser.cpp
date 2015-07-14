@@ -154,8 +154,11 @@ void laser_extinguish(){
 	  }
 	}
 }
-void laser_set_mode(int mode){
-	switch(mode){
+void laser_set_mode(laser_e mode){
+
+    laser.mode = mode;
+
+/*	switch(mode){
 		case 0:
 		  laser.mode = CONTINUOUS;
 		  return;
@@ -165,7 +168,7 @@ void laser_set_mode(int mode){
 		case 2:
 		  laser.mode = RASTER;
 		  return;
-	}
+	}*/
 }
 #ifdef LASER_PERIPHERALS
 bool laser_peripherals_ok(){
