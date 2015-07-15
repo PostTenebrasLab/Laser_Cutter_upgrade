@@ -54,6 +54,7 @@ typedef struct {
   #endif // MUVE_Z_PEEL
 } laser_t;
 
+typedef enum {CONTINUOUS, PULSED, RASTER} laser_e;
 extern laser_t laser;
 
 // TODO create
@@ -61,7 +62,7 @@ void laser_init();
 void laser_fire(int intensity);
 void laser_extinguish();
 void laser_update_lifetime();
-void laser_set_mode(int mode);
+void laser_set_mode(laser_e mode);
 #ifdef LASER_PERIPHERALS
   bool laser_peripherals_ok();
   void laser_peripherals_on();
@@ -73,8 +74,5 @@ void laser_set_mode(int mode);
 #define LASER_OFF 0
 #define LASER_ON 1
 
-#define CONTINUOUS 0
-#define PULSED 1
-#define RASTER 2
 
 #endif // LASER_H

@@ -154,19 +154,12 @@ void laser_extinguish(){
 	  }
 	}
 }
-void laser_set_mode(int mode){
-	switch(mode){
-		case 0:
-		  laser.mode = CONTINUOUS;
-		  return;
-		case 1:
-		  laser.mode = PULSED;
-		  return;
-		case 2:
-		  laser.mode = RASTER;
-		  return;
-	}
+
+void laser_set_mode(laser_e mode){
+
+    laser.mode = mode;
 }
+
 #ifdef LASER_PERIPHERALS
 bool laser_peripherals_ok(){
 	return !digitalRead(LASER_PERIPHERALS_STATUS_PIN);
@@ -178,6 +171,7 @@ void laser_peripherals_on(){
 	  SERIAL_ECHOLNPGM("Laser Peripherals Enabled");
     }
 }
+
 void laser_peripherals_off(){
 	if (!digitalRead(LASER_PERIPHERALS_STATUS_PIN)) {
 	  digitalWrite(LASER_PERIPHERALS_PIN, HIGH);
@@ -187,6 +181,7 @@ void laser_peripherals_off(){
       }
     }
 }
+
 void laser_wait_for_peripherals() {
 	unsigned long timeout = millis() + LASER_PERIPHERALS_TIMEOUT;
 	if (laser.diagnostics) {
