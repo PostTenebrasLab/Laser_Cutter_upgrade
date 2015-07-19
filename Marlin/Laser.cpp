@@ -186,3 +186,23 @@ void Laser::setPpm(uint16_t ppm) {
         Laser::ppm = ppm;
 }
 
+void Laser::setLifetime(unsigned long lifetime) {
+    Laser::lifetime = lifetime;
+}
+
+void Laser::setTime(unsigned int time) {
+    Laser::time = time;
+}
+
+unsigned int Laser::getTime() {
+    return Laser::time;
+}
+
+unsigned int Laser::getLifetime() {
+    return Laser::lifetime;
+}
+
+unsigned int Laser::getPpm() {
+    return (unsigned int)Laser::ppm;
+}
+

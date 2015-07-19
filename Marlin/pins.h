@@ -75,8 +75,8 @@
 
 #define BEEPER             -1
 
-#define FAN_PIN            -1
-#define PUMP_PIN           -1
+#define FAN_PIN            9
+#define PUMP_PIN           10
 
 #define CONTROLLERFAN_PIN  -1 //Pin used for the fan to cool controller
 
@@ -87,16 +87,16 @@
 
 #define HEATER_BED_PIN     8    // FET1 Heatbed
 
-#define HEATER_0_PIN       9    // FET2 E1/Fan
-#define HEATER_1_PIN       10   // FET3 E2/Fan
-#define HEATER_2_PIN       11   // FET4 E3/Fan
-#define HEATER_3_PIN       12   // FET5 extra MOSFET
-#define HEATER_4_PIN       2    // FET6 extra MOSFET
+#define HEATER_0_PIN       -1   // FET2 E1/Fan          (9)
+#define HEATER_1_PIN       -1   // FET3 E2/Fan          (10)
+#define HEATER_2_PIN       -1   // FET4 E3/Fan          (11)
+#define HEATER_3_PIN       -1   // FET5 extra MOSFET    (12)
+#define HEATER_4_PIN       -1    // FET6 extra MOSFET   (2)
 
 // TODO check 4 thermo numbers AD0-AD3
 #define TEMP_BED_PIN       -1  // AD0 ANALOG NUMBERING AD0 = 54 = PA16(SAM3X)
-#define TEMP_0_PIN         54  // AD0 ANALOG NUMBERING
-#define TEMP_1_PIN         55  // AD1 ANALOG NUMBERING
+#define TEMP_0_PIN         A0  // AD0 ANALOG NUMBERING
+#define TEMP_1_PIN         A1  // AD1 ANALOG NUMBERING
 #define TEMP_2_PIN         -1  // AD2 ANALOG NUMBERING
 #define TEMP_3_PIN         -1  // AD3 ANALOG NUMBERING
 

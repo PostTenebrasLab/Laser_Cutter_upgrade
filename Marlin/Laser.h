@@ -66,6 +66,11 @@ public:
   void setPpm(uint16_t ppm);
   void setMethode(methode_e methode);
   void setDuration(unsigned long duration);
+  void setLifetime(unsigned long lifetime);
+  void setTime(unsigned int time);
+  unsigned int getTime();
+  unsigned int getLifetime();
+  unsigned int getPpm();
 
 private:
 

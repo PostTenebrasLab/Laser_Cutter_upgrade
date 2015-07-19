@@ -1397,7 +1397,8 @@ void process_commands()
 	#endif // G5_BEZIER
     #ifdef LASER_RASTER
     case 7: //G7 Execute raster line
-      if (code_seen('L')) laser.raster_raw_length = int(code_value());
+      // TODO write raster methode
+      /*if (code_seen('L')) laser.raster_raw_length = int(code_value());
 	  if (code_seen('$')) {
 		laser.raster_direction = (bool)code_value();
 		destination[Y_AXIS] = current_position[Y_AXIS] + (laser.raster_mm_per_pulse * laser.raster_aspect_ratio); // increment Y axis
@@ -1411,20 +1412,17 @@ void process_commands()
         }
 	  } else {
 	    destination[X_AXIS] = current_position[X_AXIS] + (laser.raster_mm_per_pulse * laser.raster_num_pixels);
-	    if (laser.diagnostics) {
-          SERIAL_ECHO_START;
-          SERIAL_ECHOLN("Positive Raster Line");
-        }
 	  }
 
-	  laser.ppm = 1 / laser.raster_mm_per_pulse; //number of pulses per millimetre
-	  laser.duration = (1000000 / ( feedrate / 60)) / laser.ppm; // (1 second in microseconds / (time to move 1mm in microseconds)) / (pulses per mm) = Duration of pulse, taking into account feedrate as speed and ppm
+	  laser.setPpm(1 / laser.getRasterMmPerPulse); //number of pulses per millimetre
+      // TODO verify
+	  laser.setDuration((1000000*laser.getPpm()) / ( feedrate / 60)); // (1 second in microseconds / (time to move 1mm in microseconds)) / (pulses per mm) = Duration of pulse, taking into account feedrate as speed and ppm
 
-	  laser.mode = RASTER;
-	  laser.status = LASER_ON;
-	  laser.fired = RASTER;
+	  laser.setMode(RASTER);
+//	  laser.fireOn();
 	  prepare_move();
       // TODO is it ok not to turn the laser off after G7 ?
+      */
       break;
     #endif // LASER_RASTER
     #ifdef FWRETRACT
@@ -3787,12 +3785,10 @@ void manage_inactivity()
         disable_e2();
         // TODO Is it really safe ?
         #ifdef LASER
-          if (laser.time / 60000 > 0) {
-            laser.lifetime += laser.time / 60000; // convert to minutes
-            laser.time = 0;
-            Config_StoreSettings();
-	      }
-	      laser_init();
+          laser.setLifetime(laser.getLifetime() + (laser.getTime() / 60000)); // convert to minutes
+          laser.setTime(0);
+          Config_StoreSettings();
+	      laser.reset();
         #endif // LASER
         #ifdef LASER_PERIPHERALS
           laser_peripherals_off();
@@ -3863,7 +3859,7 @@ void kill()
   disable_e2();
 
   #ifdef LASER
-    laser_init();
+    laser.reset();
   #endif // LASER
 
   #ifdef LASER_PERIPHERALS
@@ -3883,9 +3879,10 @@ void kill()
 void Stop()
 {
   disable_heater();
-  #ifdef LASER
-  if (laser.diagnostics) SERIAL_ECHOLN("Laser set to off, stop() called");
-    laser_extinguish();
+  #ifdef LASER_DEBUG
+    SERIAL_ECHOLN("Laser set to off, stop() called");
+    laser.fireOff();
+    laser.reset();
   #endif
   #ifdef LASER_PERIPHERALS
   laser_peripherals_off();
