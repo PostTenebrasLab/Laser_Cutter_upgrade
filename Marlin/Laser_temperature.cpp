@@ -31,7 +31,7 @@
 
 #include "Marlin.h"
 #include "ultralcd.h"
-#include "laser_temperature.h"
+#include "Laser_temperature.h"
 #include "watchdog.h"
 
 //===========================================================================

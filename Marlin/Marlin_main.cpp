@@ -39,6 +39,7 @@
 #include "ultralcd.h"
 #include "planner.h"
 #include "stepper.h"
+#include "Laser.h"
 #include "temperature.h"
 #include "motion_control.h"
 #include "cardreader.h"
@@ -55,6 +56,10 @@
 
 #if NUM_SERVOS > 0
 #include "Servo.h"
+#endif
+
+#ifdef LASER
+extern Laser laser;
 #endif
 
 #ifdef LASER_RASTER
@@ -518,9 +523,6 @@ void setup()
 
   #ifdef DIGIPOT_I2C
     digipot_i2c_init();
-  #endif
-  #ifdef LASER
-  laser_init();
   #endif
 
 }
@@ -1176,14 +1178,11 @@ void process_commands()
           #endif //FWRETRACT
 
         #ifdef LASER_FIRE_G1
-        if (code_seen('S') && !IsStopped()) laser.intensity = (float) code_value();
-        if (code_seen('L') && !IsStopped()) laser.duration = (unsigned long) labs(code_value());
-        if (code_seen('P') && !IsStopped()) laser.ppm = (float) code_value();
-        if (code_seen('D') && !IsStopped()) laser.diagnostics = (bool) code_value();
-        if (code_seen('B') && !IsStopped()) laser_set_mode((laser_e) code_value());
-
-        laser.status = LASER_ON;
-        laser.fired = LASER_FIRE_G1;
+        if (code_seen('S') && !IsStopped()) laser.setIntensity((uint16_t) code_value());
+        if (code_seen('L') && !IsStopped()) laser.setDuration((unsigned long) labs(code_value()));
+        if (code_seen('P') && !IsStopped()) laser.setPpm((uint16_t) code_value());
+        if (code_seen('B') && !IsStopped()) laser.setMode((laser_e) code_value());
+        laser.fireOn();
         #endif // LASER_FIRE_G1
         #ifdef FWRETRACT
         if(autoretract_enabled)
@@ -1207,14 +1206,11 @@ void process_commands()
         get_arc_coordinates();
 
         #ifdef LASER_FIRE_G1
-          if (code_seen('S') && !IsStopped()) laser.intensity = (float) code_value();
-          if (code_seen('L') && !IsStopped()) laser.duration = (unsigned long) labs(code_value());
-          if (code_seen('P') && !IsStopped()) laser.ppm = (float) code_value();
-          if (code_seen('D') && !IsStopped()) laser.diagnostics = (bool) code_value();
-          if (code_seen('B') && !IsStopped()) laser_set_mode((laser_e) code_value());
-
-          laser.status = LASER_ON;
-          laser.fired = LASER_FIRE_G1;
+        if (code_seen('S') && !IsStopped()) laser.setIntensity((uint16_t) code_value());
+        if (code_seen('L') && !IsStopped()) laser.setDuration((unsigned long) labs(code_value()));
+        if (code_seen('P') && !IsStopped()) laser.setPpm((uint16_t) code_value());
+        if (code_seen('B') && !IsStopped()) laser.setMode((laser_e) code_value());
+        laser.fireOn();
         #endif // LASER_FIRE_G1
 
         prepare_arc_move(true);
@@ -1226,14 +1222,11 @@ void process_commands()
         get_arc_coordinates();
 
         #ifdef LASER_FIRE_G1
-          if (code_seen('S') && !IsStopped()) laser.intensity = (float) code_value();
-          if (code_seen('L') && !IsStopped()) laser.duration = (unsigned long) labs(code_value());
-          if (code_seen('P') && !IsStopped()) laser.ppm = (float) code_value();
-          if (code_seen('D') && !IsStopped()) laser.diagnostics = (bool) code_value();
-          if (code_seen('B') && !IsStopped()) laser_set_mode((laser_e) code_value());
-
-          laser.status = LASER_ON;
-          laser.fired = LASER_FIRE_G1;
+        if (code_seen('S') && !IsStopped()) laser.setIntensity((uint16_t) code_value());
+        if (code_seen('L') && !IsStopped()) laser.setDuration((unsigned long) labs(code_value()));
+        if (code_seen('P') && !IsStopped()) laser.setPpm((uint16_t) code_value());
+        if (code_seen('B') && !IsStopped()) laser.setMode((laser_e) code_value());
+        laser.fireOn();
         #endif // LASER_FIRE_G1
 
         prepare_arc_move(false);
@@ -3018,15 +3011,12 @@ void process_commands()
 	#ifdef LASER
 	case 649: // M649 set laser options
 	{
-	  if (code_seen('S') && !IsStopped()) {
-          laser.intensity = (float) code_value();
-          laser.rasterlaserpower =  laser.intensity;
-      }
-      if (code_seen('L') && !IsStopped()) laser.duration = (unsigned long) labs(code_value());
-      if (code_seen('P') && !IsStopped()) laser.ppm = (float) code_value();
-      if (code_seen('D') && !IsStopped()) laser.diagnostics = (bool) code_value();
-      if (code_seen('B') && !IsStopped()) laser_set_mode((laser_e) code_value());
-      if (code_seen('R') && !IsStopped()) laser.raster_mm_per_pulse = ((float) code_value());
+	  if (code_seen('S') && !IsStopped()) laser.setIntensity((uint16_t) code_value());
+//          laser.rasterlaserpower =  laser.intensity;
+      if (code_seen('L') && !IsStopped()) laser.setDuration((unsigned long) labs(code_value()));
+      if (code_seen('P') && !IsStopped()) laser.setPpm((uint16_t) code_value());
+      if (code_seen('B') && !IsStopped()) laser.setMode((laser_e) code_value());
+//      if (code_seen('R') && !IsStopped()) laser.raster_mm_per_pulse = ((float) code_value());
       if (code_seen('F')) {
         next_feedrate = code_value();
         if(next_feedrate > 0.0) feedrate = next_feedrate;

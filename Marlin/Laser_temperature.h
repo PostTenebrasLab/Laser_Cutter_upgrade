@@ -18,8 +18,8 @@
   along with Grbl.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef laser_temperature_h
-#define laser_temperature_h
+#ifndef LASER_TEMPERATURE_H
+#define LASER_TEMPERATURE_H
 
 #include "Marlin.h"
 #include "temperature.h"

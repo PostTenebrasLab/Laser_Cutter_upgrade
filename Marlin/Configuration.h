@@ -109,17 +109,25 @@
 
 #define LASER
 
-//// The following define selects how to control the laser.  Please choose the one that matches your setup.
-// 1 = Single pin control - LOW when off, HIGH when on, PWM to adjust intensity
-// 2 = Two pin control - A firing pin for which LOW = off, HIGH = on, and a seperate intensity pin which carries a constant PWM signal and adjusts duty cycle to control intensity
-#define LASER_CONTROL 2
+// The following define selects how to control the laser.  Please choose the one that matches your setup.
+// not defined = Single pin control - LOW when off, HIGH when on, PWM to adjust intensity
+// defined = Two pin control - A firing pin for which LOW = off, HIGH = on, and a seperate intensity pin which carries
+// a constant PWM signal and adjusts duty cycle to control intensity
+#define LASER_CONTROL
 
-//// The following defines select which G codes tell the laser to fire.  It's OK to uncomment more than one.
-#define LASER_FIRE_G1 10 // fire the laser on a G1 move, extinguish when the move ends
-#define LASER_FIRE_SPINDLE 11 // fire the laser on M3, extinguish on M5
-#define LASER_FIRE_E 12 // fire the laser when the E axis moves
+// The following defines select which G codes tell the laser to fire.  It's OK to uncomment more than one.
+// G mode       = 0 // fire the laser on a G1 move, extinguish when the move ends
+// SPINDLE mode = 1 // fire the laser on M3, extinguish on M5
+// E mode       = 2 // fire the laser when the E axis moves
+#define LASER_FIRE_MODE 0
 
-//// Raster mode enables the laser to etch bitmap data at high speeds.  Increases command buffer size substantially.
+// water cooling
+#define LASER_PUMP
+
+// beam air flow
+#define LASER_FAN
+
+// Raster mode enables the laser to etch bitmap data at high speeds.  Increases command buffer size substantially.
 #define LASER_RASTER
 #define LASER_MAX_RASTER_LINE 68 // maximum number of base64 encoded pixels per raster gcode command
 #define LASER_RASTER_ASPECT_RATIO 1.33 // pixels aren't square on most displays, 1.33 == 4:3 aspect ratio

@@ -22,7 +22,6 @@
 
 #include <inttypes.h>
 #include "Configuration.h"
-#include "Laser_temperature.h"
 
 
 typedef enum {CONTINUOUS, PULSED, RASTER} laser_e;
@@ -31,12 +30,18 @@ typedef enum {LASER_FIRE_G1, LASER_FIRE_SPINDLE, LASER_FIRE_E} methode_e;
 
 typedef struct {
   uint8_t nbr        :6 ;             // a pin number from 0 to 63
-  uint8_t isActive   :1 ;             // true if this channel is enabled, pin not pulsed if false
+  bool isActive      :1 ;             // true if this channel is enabled, pin not pulsed if false
 } LaserPin_t;
 
 typedef struct {
   LaserPin_t FiringPin;     // Firing pin (control mode 1 and 2)
   LaserPin_t PulsePin;      // Pulse pin (control mode 2 only)
+  LaserPin_t Therm0_Pin;    // first thermistor pin
+  LaserPin_t Therm1_Pin;    // second thermistor pin
+  LaserPin_t Therm2_Pin;    // second thermistor pin
+  LaserPin_t Therm3_Pin;    // second thermistor pin
+  LaserPin_t WaterPumpPin;  // water cooling system pump's pin
+  LaserPin_t BeamPumpPin;   // beam air flow pump's pin (blow smoke)
 } Laser_t;
 
 class Laser
@@ -44,7 +49,7 @@ class Laser
 public:
 
   Laser();
-  Laser(int FiringPin = LASER_FIRING_PIN, int PulsePin = LASER_INTENSITY_PIN, int mode = PULSED);
+//  Laser(int FiringPin = LASER_FIRING_PIN, int PulsePin = LASER_INTENSITY_PIN, int mode = PULSED);
   void reset();            // reset values (OFF)
   void stop();
   void shutdown();
@@ -53,25 +58,32 @@ public:
   void fireOn(uint16_t intensity);
   void fireOff();
 
-  void setMode(laser_e mode);
   void updateTemperatures();
+
+
+  void setMode(laser_e mode);
+  void setIntensity(uint16_t intensity);
+  void setPpm(uint16_t ppm);
+  void setMethode(methode_e methode);
+  void setDuration(unsigned long duration);
 
 private:
 
   Laser_t laser;
   uint8_t id;
   // TODO do we really need to set a methode ?
-  methode_e methode;  // method used to ask the laser to fire - LASER_FIRE_G1, LASER_FIRE_SPINDLE, LASER_FIRE_E, etc
+  methode_e methode;      // method used to ask the laser to fire - LASER_FIRE_G1, LASER_FIRE_SPINDLE, LASER_FIRE_E, etc
   uint16_t intensity;     // Laser firing instensity (0 <-> 4096) Due DAC capacity
   uint16_t ppm;           // pulses per millimeter, for pulsed firing mode (max 65535 ppm)
-  bool status; // LASER_ON / LASER_OFF - buffered
-  bool firing; // LASER_ON / LASER_OFF - instantaneous
-  laser_e mode; // CONTINUOUS, PULSED, RASTER
+  bool enabled;           // is the laser armed
+  bool status;            // LASER_ON / LASER_OFF - buffered
+  bool firing;            // LASER_ON / LASER_OFF - instantaneous
+  laser_e mode;           // CONTINUOUS, PULSED, RASTER
   unsigned long duration; // laser firing duration in microseconds, for pulsed firing mode
-  unsigned long dur; // instantaneous duration
+  unsigned long dur;      // instantaneous duration
   unsigned long last_firing; // microseconds since last laser firing
-  unsigned int time; // temporary counter to limit eeprom writes (millisec)
-  unsigned int lifetime; // laser lifetime firing counter in minutes
+  unsigned int time;      // temporary counter to limit eeprom writes (millisec)
+  unsigned int lifetime;  // laser lifetime firing counter in minutes
   #ifdef LASER_RASTER
     unsigned char raster_data[LASER_MAX_RASTER_LINE];
     unsigned char rasterlaserpower;
