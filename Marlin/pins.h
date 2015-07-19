@@ -76,6 +76,7 @@
 #define BEEPER             -1
 
 #define FAN_PIN            -1
+#define PUMP_PIN           -1
 
 #define CONTROLLERFAN_PIN  -1 //Pin used for the fan to cool controller
 
@@ -93,21 +94,19 @@
 #define HEATER_4_PIN       2    // FET6 extra MOSFET
 
 // TODO check 4 thermo numbers AD0-AD3
-#define TEMP_BED_PIN       54  // AD0 ANALOG NUMBERING AD0 = 54 = PA16(SAM3X)
+#define TEMP_BED_PIN       -1  // AD0 ANALOG NUMBERING AD0 = 54 = PA16(SAM3X)
 #define TEMP_0_PIN         54  // AD0 ANALOG NUMBERING
 #define TEMP_1_PIN         55  // AD1 ANALOG NUMBERING
-#define TEMP_2_PIN         56  // AD2 ANALOG NUMBERING
-#define TEMP_3_PIN         57  // AD3 ANALOG NUMBERING
+#define TEMP_2_PIN         -1  // AD2 ANALOG NUMBERING
+#define TEMP_3_PIN         -1  // AD3 ANALOG NUMBERING
 
 
-// TODO choose Laser pins for Due + RAMPS-FD
-#if LASER_CONTROL == 1
-#define LASER_FIRING_PIN   5
-#endif
-
-#if LASER_CONTROL == 2
-#define LASER_INTENSITY_PIN 5 // Digital pins 2, 3, 5, 6, 7, 8 are attached to timers we can use
-#define LASER_FIRING_PIN	2 // D2 is a MOSFET
+// TODO choose a pin for Due + RAMPS-FD
+#ifdef LASER_CONTROL
+    #define LASER_INTENSITY_PIN 5 // Digital pins 2, 3, 5, 6, 7, 8 are attached to timers we can use
+    #define LASER_FIRING_PIN	2
+#else
+    #define LASER_FIRING_PIN    5
 #endif
 
 #ifdef NUM_SERVOS
