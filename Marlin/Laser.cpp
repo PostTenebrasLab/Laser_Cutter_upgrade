@@ -33,8 +33,19 @@
 
 uint8_t LaserCount = 0;
 
+volatile unsigned long lastTime;
+volatile unsigned long frequence;
+
+void measureFlow(){
+
+    frequence = 1000 / (millis() - lastTime);
+    lastTime = millis();
+
+}
+
+
 /* laser constructor */
-Laser::Laser()//int FiringPin = LASER_FIRING_PIN, int PulsePin = LASER_INTENSITY_PIN, int mode = PULSED)
+Laser::Laser(int FiringPin, int PulsePin, laser_e mode)
 {
 
     // TODO init timers on laser pins
@@ -65,17 +76,18 @@ Laser::Laser()//int FiringPin = LASER_FIRING_PIN, int PulsePin = LASER_INTENSITY
             if(this->laser.Therm1_Pin.isActive) pinMode(this->laser.Therm1_Pin.nbr, INPUT);
             if(this->laser.Therm2_Pin.isActive) pinMode(this->laser.Therm2_Pin.nbr, INPUT);
 
-            #ifdef LASER_FAN
-                if(FAN_PIN > 0){
+            #if defined(LASER_FAN) && FAN_PIN > 0
                     this->laser.BeamPumpPin.nbr = FAN_PIN;
                     this->laser.BeamPumpPin.isActive = true;
-                }
             #endif
-            #ifdef LASER_PUMP
-            if(PUMP_PIN > 0){
+
+            #if defined(LASER_PUMP) && PUMP_PIN > 0
                 this->laser.WaterPumpPin.nbr = PUMP_PIN;
                 this->laser.WaterPumpPin.isActive = true;
-            }
+            #endif
+
+            #if defined(FLOW_METER_PIN) && FLOW_METER_PIN > 0
+                attachInterrupt(FLOW_METER_PIN, measureFlow, RISING);
             #endif
 
             #ifdef DEBUG_LASER
@@ -136,6 +148,11 @@ void Laser::fireOff() {
     }
 }
 
+void Laser::checkTemperatures(){
+
+
+}
+
 /* Reset laser to initial (safe) values */
 void Laser::reset() {
 
@@ -164,10 +181,8 @@ void Laser::setMode(laser_e mode) {
 
 /* change laser intensity*/
 void Laser::setIntensity(uint16_t intensity) {
-    if(intensity > 4096)
-        Laser::intensity = 4096;
-    else
-        Laser::intensity = intensity;
+
+    (intensity > 4095)? Laser::intensity = 4095 : Laser::intensity = intensity;
 }
 
 void Laser::setMethode(methode_e methode) {
@@ -180,10 +195,8 @@ void Laser::setDuration(unsigned long duration) {
 
 /* change PPM values (point per millimeter 0 <=> 4095) */
 void Laser::setPpm(uint16_t ppm) {
-    if(ppm > 4096)
-        Laser::ppm = 4095;
-    else
-        Laser::ppm = ppm;
+
+    (ppm > 4095)? Laser::ppm = 4095: Laser::ppm = ppm;
 }
 
 void Laser::setLifetime(unsigned long lifetime) {

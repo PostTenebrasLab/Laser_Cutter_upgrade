@@ -51,9 +51,9 @@
 #define Y_MIN_PIN          24
 #define Y_MAX_PIN          38
 
-#define Z_STEP_PIN         67   // AD13
-#define Z_DIR_PIN          66   // AD12
-#define Z_ENABLE_PIN       44
+#define Z_STEP_PIN         32   // for Z use 67,AD13
+#define Z_DIR_PIN          47   // for Z use 66, AD12
+#define Z_ENABLE_PIN       45   // for Z use 44
 #define Z_MIN_PIN          26
 #define Z_MAX_PIN          34
 
@@ -65,9 +65,9 @@
 #define E1_DIR_PIN         41
 #define E1_ENABLE_PIN      39
 
-#define E2_STEP_PIN        32
-#define E2_DIR_PIN         47
-#define E2_ENABLE_PIN      45
+#define E2_STEP_PIN        -1 //32
+#define E2_DIR_PIN         -1 //47
+#define E2_ENABLE_PIN      -1 //45
 
 #define SDPOWER            -1
 #define SDSS               4
@@ -77,6 +77,9 @@
 
 #define FAN_PIN            9
 #define PUMP_PIN           10
+#define FLOW_METER_PIN     58
+
+// TODO add laser line pin (red light for Z alignment)
 
 #define CONTROLLERFAN_PIN  -1 //Pin used for the fan to cool controller
 
@@ -94,9 +97,9 @@
 #define HEATER_4_PIN       -1    // FET6 extra MOSFET   (2)
 
 // TODO check 4 thermo numbers AD0-AD3
-#define TEMP_BED_PIN       -1  // AD0 ANALOG NUMBERING AD0 = 54 = PA16(SAM3X)
+#define TEMP_BED_PIN       A1  // AD0 ANALOG NUMBERING AD0 = 54 = PA16(SAM3X)
 #define TEMP_0_PIN         A0  // AD0 ANALOG NUMBERING
-#define TEMP_1_PIN         A1  // AD1 ANALOG NUMBERING
+#define TEMP_1_PIN         -1  // AD1 ANALOG NUMBERING
 #define TEMP_2_PIN         -1  // AD2 ANALOG NUMBERING
 #define TEMP_3_PIN         -1  // AD3 ANALOG NUMBERING
 

@@ -23,10 +23,11 @@
 #include <inttypes.h>
 #include "Configuration.h"
 
+extern volatile unsigned long frequence;
 
-typedef enum {CONTINUOUS, PULSED, RASTER} laser_e;
-typedef enum {OFF, ON} state_e;
-typedef enum {LASER_FIRE_G1, LASER_FIRE_SPINDLE, LASER_FIRE_E} methode_e;
+typedef enum {CONTINUOUS = 0, PULSED = 1, RASTER = 2} laser_e;
+typedef enum {OFF = 0, ON = 1} state_e;
+typedef enum {LASER_FIRE_G1 = 0, LASER_FIRE_SPINDLE = 1, LASER_FIRE_E = 2} methode_e;
 
 typedef struct {
   uint8_t nbr        :6 ;             // a pin number from 0 to 63
@@ -48,8 +49,8 @@ class Laser
 {
 public:
 
-  Laser();
-//  Laser(int FiringPin = LASER_FIRING_PIN, int PulsePin = LASER_INTENSITY_PIN, int mode = PULSED);
+//  Laser();
+  Laser(int FiringPin = LASER_FIRING_PIN, int PulsePin = LASER_INTENSITY_PIN, laser_e mode = PULSED);
   void reset();            // reset values (OFF)
   void stop();
   void shutdown();
@@ -58,7 +59,7 @@ public:
   void fireOn(uint16_t intensity);
   void fireOff();
 
-  void updateTemperatures();
+  void checkTemperatures();
 
 
   void setMode(laser_e mode);

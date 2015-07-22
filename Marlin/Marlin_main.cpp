@@ -59,7 +59,7 @@
 #endif
 
 #ifdef LASER
-extern Laser laser;
+Laser laser;
 #endif
 
 #ifdef LASER_RASTER
@@ -496,6 +496,10 @@ void setup()
   SERIAL_PROTOCOLLNPGM("start");
   SERIAL_ECHO_START;
 
+  #if MOTHERBOARD == 402 || MOTHERBOARD == 403 || MOTHERBOARD == 404
+    analogWriteResolution(12);     // increase PWM+DAC to 12 bits (SAM3X ARM)
+  #endif/la
+
   // Check startup - does nothing if bootloader sets MCUSR to 0
   byte mcu = MCUSR;
   if(mcu & 1) SERIAL_ECHOLNPGM(MSG_POWERUP);
@@ -593,8 +597,13 @@ void loop()
     bufindr = (bufindr + 1)%BUFSIZE;
   }
   //check heater every n milliseconds
+  #ifdef LASER
+  laser.checkTemperatures();
+  #else
   manage_heater();
+  #endif
   manage_inactivity();
+
   checkHitEndstops();
   lcd_update();
 }
@@ -2113,6 +2122,7 @@ void process_commands()
           SERIAL_PROTOCOLPGM(" /");
           SERIAL_PROTOCOL_F(degTargetHotend(cur_extruder),1);
         }
+
       #else
         SERIAL_ERROR_START;
         SERIAL_ERRORLNPGM(MSG_ERR_NO_THERMISTORS);
@@ -2151,6 +2161,8 @@ void process_commands()
           }
         #endif
 
+        SERIAL_PROTOCOLLN("PTL added frequency check");
+        SERIAL_ECHOLN(frequence);   // frequence flow meter
         SERIAL_PROTOCOLLN("");
       return;
       break;
