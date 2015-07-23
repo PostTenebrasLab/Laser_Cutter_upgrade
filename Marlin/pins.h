@@ -74,9 +74,8 @@
 #define LED_PIN            13
 
 #define BEEPER             -1
-#define FAN_PIN            -1
+#define FAN_PIN            9
 
-#define LASER_FAN_PIN      9
 #define LASER_PUMP_PIN     10
 #define FLOW_METER_PIN     58
 

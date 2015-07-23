@@ -31,6 +31,8 @@
 #define LASER_PPM           0
 #define LASER_DURATION      0
 #define LASER_DEFAULT_MODE  PULSED
+#define MAX_PPM             10000  // max point per mm
+#define DAC_RESOLUTION
 
 #define WRITE_PUMP(pin,value) WRITE(pin,value)
 
@@ -86,8 +88,8 @@ Laser::Laser(int FiringPin, int PulsePin, laser_e mode)
             pinMode(laser.Therm1_Pin.nbr, INPUT);
 #endif
 
-#if defined(LASER_FAN) && LASER_FAN_PIN > 0
-            laser.AirPumpPin.nbr = LASER_FAN_PIN;
+#if defined(LASER_FAN) && FAN_PIN > 0
+            laser.AirPumpPin.nbr = FAN_PIN;
             laser.AirPumpPin.isActive = true;
             pinMode(laser.AirPumpPin.nbr, OUTPUT);
 #endif
@@ -120,19 +122,30 @@ Laser::Laser(int FiringPin, int PulsePin, laser_e mode)
 }
 
 /* Firing the laser on */
-void Laser::fireOn(uint16_t intensity) {
+void Laser::fireOn(float intensity) {
 
-    if(intensity > 4096) intensity = 4096;
-    if(intensity < 0) intensity = 0;
+    setIntensity(intensity);
+    fireOn();
+}
 
+/* Firing the laser on */
+void Laser::fireOn() {
 
     if(id > 0 && enabled) {
 
-        this->firing = true;
-        this->last_firing = micros();
-
-   	    analogWrite(LASER_FIRING_PIN, labs((intensity / 4096)*(F_CPU / LASER_PWM)));
-        digitalWrite(LASER_FIRING_PIN, HIGH);
+        firing = true;
+        switch(mode) {
+            case CONTINUOUS:
+                // TODO check if laser's moving
+                digitalWrite(laser.FiringPin.nbr, HIGH);
+                break;
+            case PULSED:
+                // TODO generate PWN on FiringPin
+                break;
+            case RASTER:
+                // TODO do something
+                break;
+        }
 
         #ifdef DEBUG_LASER
             SERIAL_ECHOLN("laser firing !!!");
@@ -148,12 +161,9 @@ void Laser::fireOn(uint16_t intensity) {
 void Laser::fireOff() {
 
     digitalWrite(LASER_FIRING_PIN, LOW);
-    // TODO need to set pwm laser_intensity too ?
 
-    this->time += millis() - (this->last_firing / 1000);
-
-    if(this->firing) {
-        this->firing = false;
+    if(firing) {
+        firing = false;
         #ifdef DEBUG_LASER
             SERIAL_ECHOLN("laser turned off");
         #endif
@@ -192,7 +202,7 @@ void Laser::checkTemperatures(){
 void Laser::reset() {
 
     fireOff();            // force laser off
-    intensity = 0;        // set intensity to zero
+    intensity = 0.0;      // set intensity to zero
     ppm = 0;              // set pulses per millimeter to zero, for pulsed firing mode
     enabled = false;
 
@@ -215,9 +225,15 @@ void Laser::setMode(laser_e mode) {
 }
 
 /* change laser intensity*/
-void Laser::setIntensity(uint16_t intensity) {
+void Laser::setIntensity(float intensity) {
 
-    (intensity > 4095)? Laser::intensity = 4095 : Laser::intensity = intensity;
+    /* normalise value */
+    (intensity > 1.0)? Laser::intensity = 1.0 : Laser::intensity = intensity;
+    (intensity < 0.0)? Laser::intensity = 0.0 : Laser::intensity = intensity;
+
+//  TODO generate signal on DAC output
+//    analogWrite(laser.IntensityPin.nbr, labs((getIntensity() / DAC_RESOLUTION) * (F_CPU / LASER_PWM)));
+
 }
 
 void Laser::setMethode(methode_e methode) {
@@ -229,9 +245,9 @@ void Laser::setDuration(unsigned long duration) {
 }
 
 /* change PPM values (point per millimeter 0 <=> 4095) */
-void Laser::setPpm(uint16_t ppm) {
+void Laser::setPpm(unsigned long ppm) {
 
-    (ppm > 4095)? Laser::ppm = 4095: Laser::ppm = ppm;
+    (ppm > MAX_PPM)? Laser::ppm = MAX_PPM: Laser::ppm = ppm;
 }
 
 void Laser::setLifetime(unsigned long lifetime) {

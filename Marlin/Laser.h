@@ -56,7 +56,8 @@ public:
   void shutdown();
   void kill();
 
-  void fireOn(uint16_t intensity);
+  void fireOn();
+  void fireOn(float intensity);
   void fireOff();
 
   void checkTemperatures();
@@ -65,8 +66,8 @@ public:
 
 
   void setMode(laser_e mode);
-  void setIntensity(uint16_t intensity);
-  void setPpm(uint16_t ppm);
+  void setIntensity(float intensity);  // value between 0.0 and 1.0
+  void setPpm(unsigned long ppm);
   void setMethode(methode_e methode);
   void setDuration(unsigned long duration);
   void setLifetime(unsigned long lifetime);
@@ -81,8 +82,8 @@ private:
   uint8_t id;
   // TODO do we really need to set a methode ?
   methode_e methode;      // method used to ask the laser to fire - LASER_FIRE_G1, LASER_FIRE_SPINDLE, LASER_FIRE_E, etc
-  uint16_t intensity;     // Laser firing instensity (0 <-> 4096) Due DAC capacity
-  uint16_t ppm;           // pulses per millimeter, for pulsed firing mode (max 65535 ppm)
+  float intensity;        // Laser firing instensity (value between 0 and 1)
+  unsigned long ppm;      // pulses per millimeter, for pulsed firing mode
   bool enabled;           // is the laser armed
   bool status;            // LASER_ON / LASER_OFF - buffered
   bool firing;            // LASER_ON / LASER_OFF - instantaneous

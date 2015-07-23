@@ -3878,12 +3878,16 @@ void kill()
 
 void Stop()
 {
-  disable_heater();
+
+#ifdef LASER
+  laser.fireOff();
+  laser.reset();
   #ifdef DEBUG_LASER
     SERIAL_ECHOLN("Laser set to off, stop() called");
-    laser.fireOff();
-    laser.reset();
   #endif
+#else
+  disable_heater();
+#endif
   if(Stopped == false) {
     Stopped = true;
     Stopped_gcode_LastN = gcode_LastN; // Save last g_code for restart
