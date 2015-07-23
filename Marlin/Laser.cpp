@@ -39,6 +39,8 @@ uint8_t LaserCount = 0;
 volatile unsigned long lastTime;
 volatile unsigned long frequence;
 extern void updateTemperaturesFromRawValues();
+extern float current_temperature[EXTRUDERS];
+extern float current_temperature_bed;
 
 void measureFlow(){
 
@@ -57,50 +59,56 @@ Laser::Laser(int FiringPin, int PulsePin, laser_e mode)
 
         id = LaserCount++;
         if (LASER_MAX == 1) {       // do something here if you want add a laser
+
+#if LASER_FIRING_PIN > 0
             laser.FiringPin.nbr = LASER_FIRING_PIN;
             laser.FiringPin.isActive = true;
-
             pinMode(laser.FiringPin.nbr, OUTPUT);
+#else
+            return;
+#endif
 
-            #ifdef LASER_CONTROL
-                laser.PulsePin.nbr = LASER_INTENSITY_PIN;
-                laser.PulsePin.isActive = true;
-                pinMode(laser.PulsePin.nbr, OUTPUT);
-            #else
-                laser.PulsePin.isActive = false;
-            #endif
+#if LASER_INTENSITY_PIN > 0
+            laser.IntensityPin.nbr = LASER_INTENSITY_PIN;
+            laser.IntensityPin.isActive = true;
+            pinMode(laser.IntensityPin.nbr, OUTPUT);
+#define INTENSITY_ENABLED
+#endif
 
+#if TEMP_0_PIN > 0
             laser.Therm0_Pin.nbr = TEMP_0_PIN;
-            laser.Therm1_Pin.nbr = TEMP_1_PIN;
-            laser.Therm2_Pin.nbr = TEMP_2_PIN;
-            (TEMP_SENSOR_0 > 0)? laser.Therm0_Pin.isActive = true : laser.Therm0_Pin.isActive = false;
-            (TEMP_SENSOR_1 > 0)? laser.Therm1_Pin.isActive = true : laser.Therm1_Pin.isActive = false;
-            (TEMP_SENSOR_2 > 0)? laser.Therm2_Pin.isActive = true : laser.Therm2_Pin.isActive = false;
-            if(laser.Therm0_Pin.isActive) pinMode(laser.Therm0_Pin.nbr, INPUT);
-            if(laser.Therm1_Pin.isActive) pinMode(laser.Therm1_Pin.nbr, INPUT);
-            if(laser.Therm2_Pin.isActive) pinMode(laser.Therm2_Pin.nbr, INPUT);
+            laser.Therm0_Pin.isActive = true;
+            pinMode(laser.Therm0_Pin.nbr, INPUT);
+#endif
+#if TEMP_BED_PIN > 0
+            laser.Therm1_Pin.nbr = TEMP_BED_PIN;
+            laser.Therm1_Pin.isActive = true;
+            pinMode(laser.Therm1_Pin.nbr, INPUT);
+#endif
 
-            #if defined(LASER_FAN) && FAN_PIN > 0
-                laser.BeamPumpPin.nbr = FAN_PIN;
-                laser.BeamPumpPin.isActive = true;
-                pinMode(laser.BeamPumpPin.nbr, OUTPUT);
-            #endif
+#if defined(LASER_FAN) && LASER_FAN_PIN > 0
+            laser.AirPumpPin.nbr = LASER_FAN_PIN;
+            laser.AirPumpPin.isActive = true;
+            pinMode(laser.AirPumpPin.nbr, OUTPUT);
+#endif
 
-            #if defined(LASER_PUMP) && PUMP_PIN > 0
-                laser.WaterPumpPin.nbr = PUMP_PIN;
-                laser.WaterPumpPin.isActive = true;
-                pinMode(laser.WaterPumpPin.nbr, OUTPUT);
-            #endif
+#if defined(LASER_PUMP) && LASER_PUMP_PIN > 0
+            laser.WaterPumpPin.nbr = LASER_PUMP_PIN;
+            laser.WaterPumpPin.isActive = true;
+            pinMode(laser.WaterPumpPin.nbr, OUTPUT);
+#endif
 
-            #if defined(FLOW_METER_PIN) && FLOW_METER_PIN > 0
-                attachInterrupt(FLOW_METER_PIN, measureFlow, RISING);
-            #endif
+#if defined(FLOW_METER_PIN) && FLOW_METER_PIN > 0
+            attachInterrupt(FLOW_METER_PIN, measureFlow, RISING);
+#endif
 
-            #ifdef DEBUG_LASER
-            SERIAL_ECHOLN("Laser attached");
-            #endif
+#ifdef DEBUG_LASER
+    SERIAL_ECHOLN("Laser attached");
+#endif
+
         }
         setMode(mode);
+
     } else {
         this->id = -1;
         #ifdef DEBUG_LASER
@@ -124,9 +132,7 @@ void Laser::fireOn(uint16_t intensity) {
         this->last_firing = micros();
 
    	    analogWrite(LASER_FIRING_PIN, labs((intensity / 4096)*(F_CPU / LASER_PWM)));
-        #ifdef LASER_CONTROL
-            digitalWrite(LASER_FIRING_PIN, HIGH);
-        #endif
+        digitalWrite(LASER_FIRING_PIN, HIGH);
 
         #ifdef DEBUG_LASER
             SERIAL_ECHOLN("laser firing !!!");
@@ -157,17 +163,17 @@ void Laser::fireOff() {
 /* Switch the air pump On */
 void Laser::airPumpOn(){
 
-    #if defined(FAN_PIN) && FAN_PIN > 0
-        WRITE_PUMP(FAN_PIN,HIGH);
-    #endif
+#if defined(LASER_FAN) && LASER_FAN_PIN > 0
+    WRITE_PUMP(LASER_FAN_PIN,HIGH);
+#endif
 }
 
 /* Switch the air pump Off */
 void Laser::airPumpOff(){
 
-    #if defined(FAN_PIN) && FAN_PIN > 0
-        WRITE_PUMP(FAN_PIN, LOW);
-    #endif
+#if defined(LASER_FAN) && LASER_FAN_PIN > 0
+    WRITE_PUMP(LASER_FAN_PIN, LOW);
+#endif
 }
 
 void Laser::checkTemperatures(){

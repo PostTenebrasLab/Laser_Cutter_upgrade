@@ -115,7 +115,8 @@
 // not defined = Single pin control - LOW when off, HIGH when on, PWM to adjust intensity
 // defined = Two pin control - A firing pin for which LOW = off, HIGH = on, and a seperate intensity pin which carries
 // a constant PWM signal and adjusts duty cycle to control intensity
-#define LASER_CONTROL
+// TODO probably not necessary...remove it
+//#define LASER_CONTROL
 
 // The following defines select which G codes tell the laser to fire.  It's OK to uncomment more than one.
 // G mode       = 0 // fire the laser on a G1 move, extinguish when the move ends

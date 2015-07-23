@@ -2362,10 +2362,6 @@ void process_commands()
           LCD_MESSAGEPGM(WELCOME_MSG);
           lcd_update();
         #endif
-		#ifdef LASER_PERIPHERALS
-		  laser_peripherals_on();
-		  laser_wait_for_peripherals();
-		#endif // LASER_PERIPHERALS
         break;
       #endif
 
@@ -2377,9 +2373,6 @@ void process_commands()
         disable_e2();
         finishAndDisableSteppers();
         fanSpeed = 0;
-		#ifdef LASER_PERIPHERALS
-        	laser_peripherals_off();
-	    #endif // LASER_PERIPHERALS
         delay(1000); // Wait a little before to switch off
       #if defined(SUICIDE_PIN) && SUICIDE_PIN > -1
         st_synchronize();
@@ -3804,9 +3797,6 @@ void manage_inactivity()
           Config_StoreSettings();
 	      laser.reset();
         #endif // LASER
-        #ifdef LASER_PERIPHERALS
-          laser_peripherals_off();
-        #endif
       }
     }
   }
@@ -3876,10 +3866,6 @@ void kill()
     laser.reset();
   #endif // LASER
 
-  #ifdef LASER_PERIPHERALS
-    laser_peripherals_off();
-  #endif // LASER_PERIPHERALS
-
 #if defined(PS_ON_PIN) && PS_ON_PIN > -1
   pinMode(PS_ON_PIN,INPUT);
 #endif
@@ -3897,9 +3883,6 @@ void Stop()
     SERIAL_ECHOLN("Laser set to off, stop() called");
     laser.fireOff();
     laser.reset();
-  #endif
-  #ifdef LASER_PERIPHERALS
-  laser_peripherals_off();
   #endif
   if(Stopped == false) {
     Stopped = true;

@@ -74,9 +74,10 @@
 #define LED_PIN            13
 
 #define BEEPER             -1
+#define FAN_PIN            -1
 
-#define FAN_PIN            9
-#define PUMP_PIN           10
+#define LASER_FAN_PIN      9
+#define LASER_PUMP_PIN     10
 #define FLOW_METER_PIN     58
 
 // TODO add laser line pin (red light for Z alignment)
@@ -88,7 +89,7 @@
 #define KILL_PIN           -1
 #define EMERGENCY_STOP     40   // emergency stop IN
 
-#define HEATER_BED_PIN     8    // FET1 Heatbed
+#define HEATER_BED_PIN     -1   // FET1 Heatbed
 
 #define HEATER_0_PIN       -1   // FET2 E1/Fan          (9)
 #define HEATER_1_PIN       -1   // FET3 E2/Fan          (10)
@@ -105,12 +106,8 @@
 
 
 // TODO choose a pin for Due + RAMPS-FD
-#ifdef LASER_CONTROL
-    #define LASER_INTENSITY_PIN 5 // Digital pins 2, 3, 5, 6, 7, 8 are attached to timers we can use
-    #define LASER_FIRING_PIN	2
-#else
-    #define LASER_FIRING_PIN    5
-#endif
+#define LASER_INTENSITY_PIN 5 // Digital pins 2, 3, 5, 6, 7, 8 are attached to timers we can use
+#define LASER_FIRING_PIN	2
 
 #ifdef NUM_SERVOS
 #define SERVO0_PIN         7  // SERVO1
@@ -542,20 +539,6 @@
     #define SDSS               53
     #define LED_PIN            13
 
-	#if LASER_CONTROL == 1
-      #define LASER_FIRING_PIN    5
-    #endif
-	#if LASER_CONTROL == 2
-      #define LASER_INTENSITY_PIN 6 // Digital pins 2, 3, 5, 6, 7, 8 are attached to timers we can use
-      #define LASER_FIRING_PIN	5
-	#endif
-	#ifdef LASER_POWER_DOWN
-	  #define LASER_POWER_PIN 9 // This is currently hard-coded to timer2 which services pins 9, 10
-	#endif // LASER_POWER_DOWN
-	#ifdef LASER_PERIPHERALS
-      #define LASER_PERIPHERALS_PIN       4
-	  #define LASER_PERIPHERALS_STATUS_PIN		  11
-    #endif // LASER_PERIPHERALS
 
   #endif
 
@@ -1966,13 +1949,6 @@
   #endif
 #endif //ULTRA_LCD
 
-	#if LASER_CONTROL == 1
-      #define LASER_FIRING_PIN    5
-    #endif
-	#if LASER_CONTROL == 2
-      #define LASER_INTENSITY_PIN 5 // Digital pins 2, 3, 5, 6, 7, 8 are attached to timers we can use
-      #define LASER_FIRING_PIN	2
-	#endif
 
 #endif
 

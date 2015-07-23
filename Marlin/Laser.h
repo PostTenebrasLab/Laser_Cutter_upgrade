@@ -36,13 +36,13 @@ typedef struct {
 
 typedef struct {
   LaserPin_t FiringPin;     // Firing pin (control mode 1 and 2)
-  LaserPin_t PulsePin;      // Pulse pin (control mode 2 only)
+  LaserPin_t IntensityPin;      // Pulse pin (control mode 2 only)
   LaserPin_t Therm0_Pin;    // first thermistor pin
   LaserPin_t Therm1_Pin;    // second thermistor pin
   LaserPin_t Therm2_Pin;    // second thermistor pin
   LaserPin_t Therm3_Pin;    // second thermistor pin
   LaserPin_t WaterPumpPin;  // water cooling system pump's pin
-  LaserPin_t BeamPumpPin;   // beam air flow pump's pin (blow smoke)
+  LaserPin_t AirPumpPin;   // beam air flow pump's pin (blow smoke)
 } Laser_t;
 
 class Laser
