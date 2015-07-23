@@ -131,7 +131,7 @@ void Laser::fireOn(float intensity) {
 /* Firing the laser on */
 void Laser::fireOn() {
 
-    if(id > 0 && enabled) {
+    if(id > 0 && armed) {
 
         firing = true;
         switch(mode) {
@@ -153,7 +153,7 @@ void Laser::fireOn() {
     }
 
     #ifdef DEBUG_LASER
-        if(!enabled) SERIAL_ECHOLN("Laser is disabled can't fire it on");
+        if(!armed) SERIAL_ECHOLN("Laser is disarmed can't fire it on");
     #endif
 }
 
@@ -191,7 +191,7 @@ void Laser::checkTemperatures(){
     updateTemperaturesFromRawValues();
 
     if( abs(current_temperature_bed-current_temperature[0]) > 10) {
-        enabled = false;
+        armed = false;
         SERIAL_ECHOLN("laser too hot, laser disabled");
     }
 
@@ -204,7 +204,7 @@ void Laser::reset() {
     fireOff();            // force laser off
     intensity = 0.0;      // set intensity to zero
     ppm = 0;              // set pulses per millimeter to zero, for pulsed firing mode
-    enabled = false;
+    armed = false;
 
     #ifdef LASER_RASTER
         raster_aspect_ratio = LASER_RASTER_ASPECT_RATIO;
@@ -234,10 +234,6 @@ void Laser::setIntensity(float intensity) {
 //  TODO generate signal on DAC output
 //    analogWrite(laser.IntensityPin.nbr, labs((getIntensity() / DAC_RESOLUTION) * (F_CPU / LASER_PWM)));
 
-}
-
-void Laser::setMethode(methode_e methode) {
-    Laser::methode = methode;
 }
 
 void Laser::setDuration(unsigned long duration) {

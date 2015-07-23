@@ -1219,9 +1219,9 @@ void process_commands()
           #endif //FWRETRACT
 
         #ifdef LASER_FIRE_G1
-        if (code_seen('S') && !IsStopped()) laser.setIntensity((uint16_t) code_value());
+        if (code_seen('S') && !IsStopped()) laser.setIntensity((float) code_value());
         if (code_seen('L') && !IsStopped()) laser.setDuration((unsigned long) labs(code_value()));
-        if (code_seen('P') && !IsStopped()) laser.setPpm((uint16_t) code_value());
+        if (code_seen('P') && !IsStopped()) laser.setPpm((unsigned long) code_value());
         if (code_seen('B') && !IsStopped()) laser.setMode((laser_e) code_value());
         laser.fireOn();
         #endif // LASER_FIRE_G1
@@ -1251,9 +1251,9 @@ void process_commands()
         get_arc_coordinates();
 
         #ifdef LASER_FIRE_G1
-        if (code_seen('S') && !IsStopped()) laser.setIntensity((uint16_t) code_value());
+        if (code_seen('S') && !IsStopped()) laser.setIntensity((float) code_value());
         if (code_seen('L') && !IsStopped()) laser.setDuration((unsigned long) labs(code_value()));
-        if (code_seen('P') && !IsStopped()) laser.setPpm((uint16_t) code_value());
+        if (code_seen('P') && !IsStopped()) laser.setPpm((unsigned long) code_value());
         if (code_seen('B') && !IsStopped()) laser.setMode((laser_e) code_value());
         laser.fireOn();
         #endif // LASER_FIRE_G1
@@ -1272,9 +1272,9 @@ void process_commands()
         get_arc_coordinates();
 
         #ifdef LASER_FIRE_G1
-        if (code_seen('S') && !IsStopped()) laser.setIntensity((uint16_t) code_value());
+        if (code_seen('S') && !IsStopped()) laser.setIntensity((float) code_value());
         if (code_seen('L') && !IsStopped()) laser.setDuration((unsigned long) labs(code_value()));
-        if (code_seen('P') && !IsStopped()) laser.setPpm((uint16_t) code_value());
+        if (code_seen('P') && !IsStopped()) laser.setPpm((unsigned long) code_value());
         if (code_seen('B') && !IsStopped()) laser.setMode((laser_e) code_value());
         laser.fireOn();
         #endif // LASER_FIRE_G1
@@ -3219,10 +3219,10 @@ void process_commands()
 	#ifdef LASER
 	case 649: // M649 set laser options
 	{
-	  if (code_seen('S') && !IsStopped()) laser.setIntensity((uint16_t) code_value());
+	  if (code_seen('S') && !IsStopped()) laser.setIntensity((float) code_value());
 //          laser.rasterlaserpower =  laser.intensity;
       if (code_seen('L') && !IsStopped()) laser.setDuration((unsigned long) labs(code_value()));
-      if (code_seen('P') && !IsStopped()) laser.setPpm((uint16_t) code_value());
+      if (code_seen('P') && !IsStopped()) laser.setPpm((unsigned long) code_value());
       if (code_seen('B') && !IsStopped()) laser.setMode((laser_e) code_value());
 //      if (code_seen('R') && !IsStopped()) laser.raster_mm_per_pulse = ((float) code_value());
       if (code_seen('F')) {

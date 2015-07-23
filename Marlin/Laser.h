@@ -26,8 +26,6 @@
 extern volatile unsigned long frequence;
 
 typedef enum {CONTINUOUS = 0, PULSED = 1, RASTER = 2} laser_e;
-typedef enum {OFF = 0, ON = 1} state_e;
-typedef enum {LASER_FIRE_G1 = 0, LASER_FIRE_SPINDLE = 1, LASER_FIRE_E = 2} methode_e;
 
 typedef struct {
   uint8_t nbr        :6 ;             // a pin number from 0 to 63
@@ -68,7 +66,6 @@ public:
   void setMode(laser_e mode);
   void setIntensity(float intensity);  // value between 0.0 and 1.0
   void setPpm(unsigned long ppm);
-  void setMethode(methode_e methode);
   void setDuration(unsigned long duration);
   void setLifetime(unsigned long lifetime);
   void setTime(unsigned int time);
@@ -80,12 +77,10 @@ private:
 
   Laser_t laser;
   uint8_t id;
-  // TODO do we really need to set a methode ?
-  methode_e methode;      // method used to ask the laser to fire - LASER_FIRE_G1, LASER_FIRE_SPINDLE, LASER_FIRE_E, etc
   float intensity;        // Laser firing instensity (value between 0 and 1)
   unsigned long ppm;      // pulses per millimeter, for pulsed firing mode
-  bool enabled;           // is the laser armed
-  bool status;            // LASER_ON / LASER_OFF - buffered
+  bool armed;             // is the laser armed
+//  bool status;            // LASER_ON / LASER_OFF - buffered
   bool firing;            // LASER_ON / LASER_OFF - instantaneous
   laser_e mode;           // CONTINUOUS, PULSED, RASTER
   unsigned long duration; // laser firing duration in microseconds, for pulsed firing mode
