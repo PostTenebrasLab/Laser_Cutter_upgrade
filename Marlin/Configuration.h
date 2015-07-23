@@ -109,6 +109,8 @@
 
 #define LASER
 
+//#define DEBUG_LASER
+
 // The following define selects how to control the laser.  Please choose the one that matches your setup.
 // not defined = Single pin control - LOW when off, HIGH when on, PWM to adjust intensity
 // defined = Two pin control - A firing pin for which LOW = off, HIGH = on, and a seperate intensity pin which carries

@@ -60,6 +60,8 @@ public:
   void fireOff();
 
   void checkTemperatures();
+  void airPumpOn();
+  void airPumpOff();
 
 
   void setMode(laser_e mode);

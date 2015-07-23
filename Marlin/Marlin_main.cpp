@@ -596,10 +596,10 @@ void loop()
     buflen = (buflen-1);
     bufindr = (bufindr + 1)%BUFSIZE;
   }
-  //check heater every n milliseconds
   #ifdef LASER
   laser.checkTemperatures();
   #else
+  //check heater every n milliseconds
   manage_heater();
   #endif
   manage_inactivity();
@@ -2305,9 +2305,11 @@ void process_commands()
         else {
           fanSpeed=255;
         }
+        laser.airPumpOff();
         break;
       case 107: //M107 Fan Off
         fanSpeed = 0;
+        laser.airPumpOn();
         break;
     #endif //FAN_PIN
     #ifdef BARICUDA
@@ -3891,7 +3893,7 @@ void kill()
 void Stop()
 {
   disable_heater();
-  #ifdef LASER_DEBUG
+  #ifdef DEBUG_LASER
     SERIAL_ECHOLN("Laser set to off, stop() called");
     laser.fireOff();
     laser.reset();
