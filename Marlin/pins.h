@@ -74,9 +74,9 @@
 #define LED_PIN            13
 
 #define BEEPER             -1
-#define FAN_PIN            9
+#define FAN_PIN            11
 
-#define LASER_PUMP_PIN     10
+#define LASER_PUMP_PIN     11
 #define FLOW_METER_PIN     58
 
 // TODO add laser line pin (red light for Z alignment)
@@ -90,7 +90,7 @@
 
 #define HEATER_BED_PIN     -1   // FET1 Heatbed
 
-#define HEATER_0_PIN       -1   // FET2 E1/Fan          (9)
+#define HEATER_0_PIN       9    // FET2 E1/Fan          (9)
 #define HEATER_1_PIN       -1   // FET3 E2/Fan          (10)
 #define HEATER_2_PIN       -1   // FET4 E3/Fan          (11)
 #define HEATER_3_PIN       -1   // FET5 extra MOSFET    (12)

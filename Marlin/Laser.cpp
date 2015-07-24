@@ -34,7 +34,7 @@
 #define MAX_PPM             10000  // max point per mm
 #define DAC_RESOLUTION
 
-#define WRITE_PUMP(pin,value) WRITE(pin,value)
+//#define WRITE_PUMP(pin,value) WRITE(pin,value)
 
 uint8_t LaserCount = 0;
 
@@ -92,6 +92,7 @@ Laser::Laser(int FiringPin, int PulsePin, laser_e mode)
             laser.AirPumpPin.nbr = FAN_PIN;
             laser.AirPumpPin.isActive = true;
             pinMode(laser.AirPumpPin.nbr, OUTPUT);
+            airPumpOff();
 #endif
 
 #if defined(LASER_PUMP) && LASER_PUMP_PIN > 0
@@ -104,18 +105,18 @@ Laser::Laser(int FiringPin, int PulsePin, laser_e mode)
             attachInterrupt(FLOW_METER_PIN, measureFlow, RISING);
 #endif
 
-#ifdef DEBUG_LASER
+/*#ifdef DEBUG_LASER
     SERIAL_ECHOLN("Laser attached");
-#endif
+#endif*/
 
         }
         setMode(mode);
 
     } else {
         this->id = -1;
-        #ifdef DEBUG_LASER
+/*        #ifdef DEBUG_LASER
             SERIAL_ECHOLN("Too many laser");
-        #endif
+        #endif*/
     }
 
     reset();
@@ -147,14 +148,14 @@ void Laser::fireOn() {
                 break;
         }
 
-        #ifdef DEBUG_LASER
+/*        #ifdef DEBUG_LASER
             SERIAL_ECHOLN("laser firing !!!");
-        #endif
+        #endif*/
     }
 
-    #ifdef DEBUG_LASER
+/*    #ifdef DEBUG_LASER
         if(!armed) SERIAL_ECHOLN("Laser is disarmed can't fire it on");
-    #endif
+    #endif*/
 }
 
 /* Firing the laser off */
@@ -164,25 +165,25 @@ void Laser::fireOff() {
 
     if(firing) {
         firing = false;
-        #ifdef DEBUG_LASER
+/*        #ifdef DEBUG_LASER
             SERIAL_ECHOLN("laser turned off");
-        #endif
+        #endif*/
     }
 }
 
 /* Switch the air pump On */
 void Laser::airPumpOn(){
 
-#if defined(LASER_FAN) && LASER_FAN_PIN > 0
-    WRITE_PUMP(LASER_FAN_PIN,HIGH);
+#if defined(LASER_FAN) && FAN_PIN > 0
+    digitalWrite(FAN_PIN,HIGH);
 #endif
 }
 
 /* Switch the air pump Off */
 void Laser::airPumpOff(){
 
-#if defined(LASER_FAN) && LASER_FAN_PIN > 0
-    WRITE_PUMP(LASER_FAN_PIN, LOW);
+#if defined(LASER_FAN) && FAN_PIN > 0
+    digitalWrite(FAN_PIN, LOW);
 #endif
 }
 
@@ -192,7 +193,7 @@ void Laser::checkTemperatures(){
 
     if( abs(current_temperature_bed-current_temperature[0]) > 10) {
         armed = false;
-        SERIAL_ECHOLN("laser too hot, laser disabled");
+//        SERIAL_ECHOLN("laser too hot, laser disabled");
     }
 
 

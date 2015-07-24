@@ -2161,8 +2161,6 @@ void process_commands()
           }
         #endif
 
-        SERIAL_PROTOCOLLN("PTL added frequency check");
-        SERIAL_ECHOLN(frequence);   // frequence flow meter
         SERIAL_PROTOCOLLN("");
       return;
       break;
