@@ -83,6 +83,7 @@ unsigned char eeprom_read_byte(unsigned char *pos);
 // timers
 #define STEP_TIMER_NUM 3
 #define TEMP_TIMER_NUM 4
+#define LASER_TIMER_NUM 6
 
 #define HAL_TIMER_RATE 		     (F_CPU/32.0)
 #define TICKS_PER_NANOSECOND   (HAL_TIMER_RATE)/1000
@@ -90,9 +91,12 @@ unsigned char eeprom_read_byte(unsigned char *pos);
 #define ENABLE_STEPPER_DRIVER_INTERRUPT()	HAL_timer_enable_interrupt (STEP_TIMER_NUM)
 #define DISABLE_STEPPER_DRIVER_INTERRUPT()	HAL_timer_disable_interrupt (STEP_TIMER_NUM)
 
+#define ENABLE_LASER_INTERRUPT()	HAL_timer_enable_interrupt (LASER_TIMER_NUM)
+#define DISABLE_LASER_INTERRUPT()	HAL_timer_disable_interrupt (LASER_TIMER_NUM)
 //
 #define HAL_STEP_TIMER_ISR 	void TC3_Handler()
 #define HAL_TEMP_TIMER_ISR 	void TC4_Handler()
+#define HAL_LASER_TIMER_ISR	void TC6_Handler()
 
 void HAL_timer_start (uint8_t timer_num, uint32_t frequency);
 void HAL_timer_set_count (uint8_t timer_num, uint32_t count);

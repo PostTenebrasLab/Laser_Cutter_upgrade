@@ -105,6 +105,13 @@ Laser::Laser(int FiringPin, int PulsePin, laser_e mode)
             attachInterrupt(FLOW_METER_PIN, measureFlow, RISING);
 #endif
 
+
+            /* Activate timer for pulse and intensity */
+            HAL_timer_isr_prologue (LASER_TIMER_NUM);
+            HAL_timer_set_count (STEP_TIMER_NUM, HAL_TIMER_RATE / 1000); // 1kHz
+            HAL_timer_start (STEP_TIMER_NUM, 1000);
+            ENABLE_LASER_INTERRUPT();
+            sei();
 /*#ifdef DEBUG_LASER
     SERIAL_ECHOLN("Laser attached");
 #endif*/
@@ -222,6 +229,16 @@ void Laser::reset() {
 /* change laser mode */
 void Laser::setMode(laser_e mode) {
     // TODO set PULSED || CONTINUOUS || RASTER need to change behaviors ?
+
+    /* Activate timer for pulse mode */
+    if(Laser::mode != PULSED && mode == PULSED) {
+//        HAL_timer_isr_prologue (LASER_TIMER_NUM);
+//        HAL_timer_set_count (STEP_TIMER_NUM, HAL_TIMER_RATE / 1000); // 1kHz
+//        HAL_timer_start (STEP_TIMER_NUM, 1000);
+//        ENABLE_LASER_INTERRUPT();
+//        sei();
+    }
+
     Laser::mode = mode;
 }
 
@@ -237,33 +254,19 @@ void Laser::setIntensity(float intensity) {
 
 }
 
-void Laser::setDuration(unsigned long duration) {
-    Laser::duration = duration;
-}
+void Laser::setDuration(float duration) {
 
-/* change PPM values (point per millimeter 0 <=> 4095) */
-void Laser::setPpm(unsigned long ppm) {
+    /* normalise value */
+    (duration > 1.0)? Laser::duration = 1.0 : Laser::duration = duration;
+    (duration < 0.0)? Laser::duration = 0.0 : Laser::duration = duration;
 
-    (ppm > MAX_PPM)? Laser::ppm = MAX_PPM: Laser::ppm = ppm;
 }
 
 void Laser::setLifetime(unsigned long lifetime) {
     Laser::lifetime = lifetime;
 }
 
-void Laser::setTime(unsigned int time) {
-    Laser::time = time;
-}
-
-unsigned int Laser::getTime() {
-    return Laser::time;
-}
-
 unsigned int Laser::getLifetime() {
     return Laser::lifetime;
-}
-
-unsigned int Laser::getPpm() {
-    return (unsigned int)Laser::ppm;
 }
 

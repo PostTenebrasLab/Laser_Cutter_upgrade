@@ -1220,8 +1220,7 @@ void process_commands()
 
         #ifdef LASER_FIRE_G1
         if (code_seen('S') && !IsStopped()) laser.setIntensity((float) code_value());
-        if (code_seen('L') && !IsStopped()) laser.setDuration((unsigned long) labs(code_value()));
-        if (code_seen('P') && !IsStopped()) laser.setPpm((unsigned long) code_value());
+        if (code_seen('L') && !IsStopped()) laser.setDuration((float) labs(code_value()));
         if (code_seen('B') && !IsStopped()) laser.setMode((laser_e) code_value());
         laser.fireOn();
         #endif // LASER_FIRE_G1
@@ -1252,8 +1251,7 @@ void process_commands()
 
         #ifdef LASER_FIRE_G1
         if (code_seen('S') && !IsStopped()) laser.setIntensity((float) code_value());
-        if (code_seen('L') && !IsStopped()) laser.setDuration((unsigned long) labs(code_value()));
-        if (code_seen('P') && !IsStopped()) laser.setPpm((unsigned long) code_value());
+        if (code_seen('L') && !IsStopped()) laser.setDuration((float) labs(code_value()));
         if (code_seen('B') && !IsStopped()) laser.setMode((laser_e) code_value());
         laser.fireOn();
         #endif // LASER_FIRE_G1
@@ -1273,8 +1271,7 @@ void process_commands()
 
         #ifdef LASER_FIRE_G1
         if (code_seen('S') && !IsStopped()) laser.setIntensity((float) code_value());
-        if (code_seen('L') && !IsStopped()) laser.setDuration((unsigned long) labs(code_value()));
-        if (code_seen('P') && !IsStopped()) laser.setPpm((unsigned long) code_value());
+        if (code_seen('L') && !IsStopped()) laser.setDuration((float) labs(code_value()));
         if (code_seen('B') && !IsStopped()) laser.setMode((laser_e) code_value());
         laser.fireOn();
         #endif // LASER_FIRE_G1
@@ -3219,8 +3216,7 @@ void process_commands()
 	{
 	  if (code_seen('S') && !IsStopped()) laser.setIntensity((float) code_value());
 //          laser.rasterlaserpower =  laser.intensity;
-      if (code_seen('L') && !IsStopped()) laser.setDuration((unsigned long) labs(code_value()));
-      if (code_seen('P') && !IsStopped()) laser.setPpm((unsigned long) code_value());
+      if (code_seen('L') && !IsStopped()) laser.setDuration((float) labs(code_value()));
       if (code_seen('B') && !IsStopped()) laser.setMode((laser_e) code_value());
 //      if (code_seen('R') && !IsStopped()) laser.raster_mm_per_pulse = ((float) code_value());
       if (code_seen('F')) {
@@ -3651,6 +3647,7 @@ void prepare_move()
   }
 #endif //DUAL_X_CARRIAGE
 
+  // TODO change LASER_FIRE_E in prepare_move()
 #ifdef LASER_FIRE_E
   if (current_position[E_AXIS] != destination[E_AXIS] && ((current_position[X_AXIS] != destination [X_AXIS]) || (current_position[Y_AXIS] != destination [Y_AXIS]) || (current_position[Z_AXIS] != destination [Z_AXIS]) )){
 	laser.status = LASER_ON;
@@ -3790,8 +3787,8 @@ void manage_inactivity()
         disable_e2();
         // TODO Is it really safe ?
         #ifdef LASER
-          laser.setLifetime(laser.getLifetime() + (laser.getTime() / 60000)); // convert to minutes
-          laser.setTime(0);
+//          laser.setLifetime(laser.getLifetime() + (laser.getTime() / 60000)); // convert to minutes
+//          laser.setTime(0);
           Config_StoreSettings();
 	      laser.reset();
         #endif // LASER

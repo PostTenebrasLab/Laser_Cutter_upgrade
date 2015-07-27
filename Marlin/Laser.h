@@ -65,13 +65,9 @@ public:
 
   void setMode(laser_e mode);
   void setIntensity(float intensity);  // value between 0.0 and 1.0
-  void setPpm(unsigned long ppm);
-  void setDuration(unsigned long duration);
+  void setDuration(float duration);
   void setLifetime(unsigned long lifetime);
-  void setTime(unsigned int time);
-  unsigned int getTime();
   unsigned int getLifetime();
-  unsigned int getPpm();
 
 private:
 
@@ -80,14 +76,13 @@ private:
   float intensity;        // Laser firing instensity (value between 0 and 1)
   unsigned long ppm;      // pulses per millimeter, for pulsed firing mode
   bool armed;             // is the laser armed
-//  bool status;            // LASER_ON / LASER_OFF - buffered
   bool firing;            // LASER_ON / LASER_OFF - instantaneous
   laser_e mode;           // CONTINUOUS, PULSED, RASTER
-  unsigned long duration; // laser firing duration in microseconds, for pulsed firing mode
-  unsigned long dur;      // instantaneous duration
-  unsigned long last_firing; // microseconds since last laser firing
-  unsigned int time;      // temporary counter to limit eeprom writes (millisec)
+  unsigned long frequency;// pulse frequency (pulse/sec)
+  float duration;         // laser firing ratio of pulse frequency (0..1), for pulsed firing mode
+  // TODO is a lifetime still useful ?
   unsigned int lifetime;  // laser lifetime firing counter in minutes
+
   #ifdef LASER_RASTER
     unsigned char raster_data[LASER_MAX_RASTER_LINE];
     unsigned char rasterlaserpower;
