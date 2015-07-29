@@ -4,35 +4,43 @@ This project aims to improve a cheap Chinese 40W laser cutter, by making it easi
 
 ## TODO
 
-### controller
-
- * RAMP-FD[1] (3.3V) see hot it work
- * test it with Udoo[2]
-
-### z axis
-
- * add an endstop
- * improve friction of the mechanism
- * screw it in place
- * decouper et installer le nid-d'abeille
-
 ### cooling system
 
- * change the pump (???)
- * add flow sensor
- * add a themperatur sensor somewhere (in the tower ?)
- 
+ * change the pump
 
 ### Laser
 
- * change the lens
- * install an air flow for the lens
  * check the PWM control of the laser
 
 ### Filtration system
 
  * install an extraction for the fumes.
 
+## Done
+
+### cooling system
+
+ * add flow sensor
+ * add two temperature sensors, one in the flow sensor (output of laser) another at laser input
+ 
+### Laser
+
+ * changed lens
+ * installed an air flow for the lens
+ * installed an air pump
+ * installed two red laser for Z probing
+ 
+### controller
+
+ * RAMP-FD[1] (3.3V) installed
+ * tested it with Udoo[2] work fine
+ 
+### z axis
+
+ * add an endstop
+ * improve friction of the mechanism
+ * screw it in place
+ * decouper et installer le nid-d'abeille
 
 ### Links
 
