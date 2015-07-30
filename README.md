@@ -2,6 +2,41 @@
 
 This project aims to improve a cheap Chinese 40W laser cutter, by making it easier and safer to use. 
 
+## Marlin modifications
+
+### control de temperature (manage_heater())
+
+Le principe serait de stopper le laser en cas de surchauffe. Il y a deux thermistors une avant le laser (bed) et 
+l'autre après (heater0). Pourquoi pas allumer aussi le ventil du watercooling avec heater_1+term_1 quand la tour est
+chaude ?
+
+HEATER == watercooling pump
+reglage en jouant sur les target_temp du heater
+on peut aussi varier la tension sur la pompe en jouant sur PID_MAX
+
+la pompe peut être gérée comme un heater tant que la target température n'est pas atteinte bang-bang (disable PID). 
+Dès qu'elle est atteinte, on kill()
+
+On devrait pouvoir modifier facilement le comportement dans température.
+
+
+FAN == air pump (mieux vaut disable auto_fan in Configuration_adv.h)
+reglage avec fanSpeed 
+
+le fonctionnement de la airpump est proche de celle du FAN gestion par Gcode (M106/107) avec fanSpeed (0..255 attention
+Due utilise 12bits 0..4095)
+
+### Fonctionnement du Laser  
+
+Dans planner, plan_buffer_line() gère les accélérations et serait un bon candidat pour gérer l'allumage du laser
+
+voir si on peut l'intégrer dans la struct block_t. Marlin traite des blocks dans une FIFO (instruction de mouvement)
+pourquoi ne pas en profiter pour intégrer le contrôle du laser ?
+
+### Emergency Stop
+
+
+  
 ## TODO
 
 ### cooling system
