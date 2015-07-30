@@ -46,7 +46,8 @@ extern float current_temperature_bed;
 
 void measureFlow(){
 
-    frequence = 1000 / (millis() - lastTime);
+    /* weighted average of last measure and new one */
+    frequence = 1000 * (frequence + 1) / (1000 + millis() - lastTime);
     lastTime = millis();
 
 }

@@ -247,7 +247,7 @@ float extruder_offset[NUM_EXTRUDER_OFFSETS][EXTRUDERS] = {
 };
 #endif
 uint8_t active_extruder = 0;
-int fanSpeed=0;
+int fanSpeed=255;
 #ifdef SERVO_ENDSTOPS
   int servo_endstops[] = SERVO_ENDSTOPS;
   int servo_endstop_angles[] = SERVO_ENDSTOP_ANGLES;
@@ -496,9 +496,10 @@ void setup()
   SERIAL_PROTOCOLLNPGM("start");
   SERIAL_ECHO_START;
 
-  #if MOTHERBOARD == 402 || MOTHERBOARD == 403 || MOTHERBOARD == 404
-    analogWriteResolution(12);     // increase PWM+DAC to 12 bits (SAM3X ARM)
-  #endif/la
+//#if MOTHERBOARD == 402 || MOTHERBOARD == 403 || MOTHERBOARD == 404
+//#if defined (ARDUINO_ARCH_SAM)
+//    analogWriteResolution(12);     // increase PWM+DAC to 12 bits (SAM3X ARM)
+//#endif
 
   // Check startup - does nothing if bootloader sets MCUSR to 0
   byte mcu = MCUSR;
@@ -711,7 +712,6 @@ void get_command()
 
         }
 
-        // TODO check how emergency kill() work with a laser (M112)
         //If command was e-stop process now
         if(strcmp(cmdbuffer[bufindw], "M112") == 0)
           kill();
@@ -2295,16 +2295,14 @@ void process_commands()
     #if defined(FAN_PIN) && FAN_PIN > -1
       case 106: //M106 Fan On
         if (code_seen('S')){
-           fanSpeed=constrain(code_value(),0,255);
+           fanSpeed=255-constrain(code_value(),0,255);
         }
         else {
-          fanSpeed=255;
+          fanSpeed = 0;   // MAX when zero !?
         }
-        laser.airPumpOff();
         break;
       case 107: //M107 Fan Off
-        fanSpeed = 0;
-        laser.airPumpOn();
+        fanSpeed = 255; // off when max !?
         break;
     #endif //FAN_PIN
     #ifdef BARICUDA
@@ -2367,7 +2365,7 @@ void process_commands()
         disable_e1();
         disable_e2();
         finishAndDisableSteppers();
-        fanSpeed = 0;
+        fanSpeed = MAX_PWM;
         delay(1000); // Wait a little before to switch off
       #if defined(SUICIDE_PIN) && SUICIDE_PIN > -1
         st_synchronize();
@@ -3785,12 +3783,8 @@ void manage_inactivity()
         disable_e0();
         disable_e1();
         disable_e2();
-        // TODO Is it really safe ?
+        // TODO do we need to do something here ?
         #ifdef LASER
-//          laser.setLifetime(laser.getLifetime() + (laser.getTime() / 60000)); // convert to minutes
-//          laser.setTime(0);
-          Config_StoreSettings();
-	      laser.reset();
         #endif // LASER
       }
     }
@@ -3858,7 +3852,8 @@ void kill()
   disable_e2();
 
   #ifdef LASER
-    laser.reset();
+  laser.fireOff();
+  laser.reset();
   #endif // LASER
 
 #if defined(PS_ON_PIN) && PS_ON_PIN > -1

@@ -163,6 +163,10 @@ unsigned long watchmillis[EXTRUDERS] = ARRAY_BY_EXTRUDERS(0,0,0);
 #define WRITE_HEATER(pin,value) WRITE(pin,value)
 #endif
 
+#ifdef LASER
+static int pid_waterCooling = 127;  // current send to the pump 0..4095 (static by now)
+#endif // LASER
+
 //===========================================================================
 //=============================   functions      ============================
 //===========================================================================
@@ -475,7 +479,12 @@ void manage_heater()
   #else /* PID off */
     pid_output = 0;
     if(current_temperature[e] < target_temperature[e]) {
+
+    #ifdef LASER
+      pid_output = pid_waterCooling;
+    #else
       pid_output = PID_MAX;
+    #endif // LASER
     }
   #endif
 
