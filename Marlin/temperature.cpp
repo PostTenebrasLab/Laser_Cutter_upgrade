@@ -71,7 +71,11 @@ unsigned char soft_pwm_bed;
 #ifdef BABYSTEPPING
   volatile int babystepsTodo[3]={0,0,0};
 #endif
-  
+
+#ifdef LASER
+bool laser_overheat;
+#endif
+
 //===========================================================================
 //=============================private variables============================
 //===========================================================================
@@ -480,20 +484,26 @@ void manage_heater()
     pid_output = 0;
     if(current_temperature[e] < target_temperature[e]) {
 
-    #ifdef LASER
-      pid_output = pid_waterCooling;
-    #else
       pid_output = PID_MAX;
-    #endif // LASER
     }
   #endif
 
     // Check if temperature is within the correct range
     if((current_temperature[e] > minttemp[e]) && (current_temperature[e] < maxttemp[e])) 
     {
-      soft_pwm[e] = (int)pid_output >> 1;
+#ifdef LASER
+      soft_pwm[e] = 127;   // RUN pump/FAN
     }
-    else {
+    else if( current_temperature[e] < maxttemp[e] ) {
+
+      soft_pwm[e] = 255;   // keep cooling as fast as we can
+      laser_overheat = true;
+    }
+#else
+      soft_pwm[e] = (int)pid_output >> 1;
+#endif
+    else
+    {
       soft_pwm[e] = 0;
     }
 
@@ -909,6 +919,10 @@ void tp_init()
 #endif
   }
 #endif //BED_MAXTEMP
+
+#ifdef LASER
+  laser_overheat = false;
+#endif
 }
 
 void setWatch() 

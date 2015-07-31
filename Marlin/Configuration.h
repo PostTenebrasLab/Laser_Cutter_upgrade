@@ -83,11 +83,11 @@
 
 /* increase resolution to 12bits for ARM */
 //#if defined (ARDUINO_ARCH_SAM)
-#if MOTHERBOARD == 402 || MOTHERBOARD == 403 || MOTHERBOARD == 404
-    #define MAX_PWM 4095
-#else
-#define MAX_PWM 255
-#endif
+//#if MOTHERBOARD == 402 || MOTHERBOARD == 403 || MOTHERBOARD == 404
+//    #define MAX_PWM 4095
+//#else
+//#define MAX_PWM 255
+//#endif
 
 // Define this to set a custom name for your generic Mendel,
 // #define CUSTOM_MENDEL_NAME "This Mendel"
@@ -97,7 +97,7 @@
 // #define MACHINE_UUID "00000000-0000-0000-0000-000000000000"
 
 // This defines the number of extruders
-#define EXTRUDERS 1
+#define EXTRUDERS 2
 
 //// The following define selects which power supply you have. Please choose the one that matches your setup
 // 1 = ATX
@@ -222,7 +222,7 @@
 // to check that the wiring to the thermistor is not broken.
 // Otherwise this would lead to the heater being powered on all the time.
 #define HEATER_0_MINTEMP 5
-#define HEATER_1_MINTEMP 5
+#define HEATER_1_MINTEMP 30
 #define HEATER_2_MINTEMP 5
 #define BED_MINTEMP 5
 
@@ -230,7 +230,7 @@
 // This feature exists to protect your hotend from overheating accidentally, but *NOT* from thermistor short/failure!
 // You should use MINTEMP for thermistor short/failure protection.
 #define HEATER_0_MAXTEMP 90
-#define HEATER_1_MAXTEMP 90
+#define HEATER_1_MAXTEMP 200
 #define HEATER_2_MAXTEMP 90
 #define BED_MAXTEMP 70
 
@@ -245,11 +245,11 @@
 
 // PID settings:
 // Comment the following line to disable PID and enable bang-bang.
-//#define PIDTEMP
+#define PIDTEMP
 #define BANG_MAX 255 // limits current to nozzle while in bang-bang mode; 255=full current
 #define PID_MAX 255 // limits current to nozzle while PID is active (see PID_FUNCTIONAL_RANGE below); 255=full current
 #ifdef PIDTEMP
-  //#define PID_DEBUG // Sends debug data to the serial port.
+  #define PID_DEBUG // Sends debug data to the serial port.
   //#define PID_OPENLOOP 1 // Puts PID in open loop. M104/M140 sets the output power from 0 to PID_MAX
   #define PID_FUNCTIONAL_RANGE 10 // If the temperature difference between the target temperature and the actual temperature
                                   // is more then PID_FUNCTIONAL_RANGE then the PID will be shut off and the heater will be set to min/max.

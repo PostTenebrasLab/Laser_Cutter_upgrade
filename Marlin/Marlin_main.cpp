@@ -2365,7 +2365,7 @@ void process_commands()
         disable_e1();
         disable_e2();
         finishAndDisableSteppers();
-        fanSpeed = MAX_PWM;
+        fanSpeed = 255;
         delay(1000); // Wait a little before to switch off
       #if defined(SUICIDE_PIN) && SUICIDE_PIN > -1
         st_synchronize();
