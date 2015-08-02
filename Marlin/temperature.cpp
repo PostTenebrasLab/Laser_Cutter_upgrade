@@ -167,10 +167,6 @@ unsigned long watchmillis[EXTRUDERS] = ARRAY_BY_EXTRUDERS(0,0,0);
 #define WRITE_HEATER(pin,value) WRITE(pin,value)
 #endif
 
-#ifdef LASER
-static int pid_waterCooling = 127;  // current send to the pump 0..4095 (static by now)
-#endif // LASER
-
 //===========================================================================
 //=============================   functions      ============================
 //===========================================================================
@@ -426,7 +422,7 @@ void manage_heater()
 
   updateTemperaturesFromRawValues();
 
-  for(int e = 0; e < EXTRUDERS; e++) 
+  for(int e = 0; e < EXTRUDERS; e++)
   {
 
   #ifdef THERMAL_RUNAWAY_PROTECTION_PERIOD && THERMAL_RUNAWAY_PROTECTION_PERIOD > 0
@@ -489,23 +485,25 @@ void manage_heater()
   #endif
 
     // Check if temperature is within the correct range
-    if((current_temperature[e] > minttemp[e]) && (current_temperature[e] < maxttemp[e])) 
-    {
+    if((current_temperature[e] > minttemp[e]) && (current_temperature[e] < maxttemp[e])) {
 #ifdef LASER
-      soft_pwm[e] = 127;   // RUN pump/FAN
-    }
-    else if( current_temperature[e] < maxttemp[e] ) {
-
-      soft_pwm[e] = 255;   // keep cooling as fast as we can
-      laser_overheat = true;
-    }
+        switch(e)
+        {
+            case 0:
+                soft_pwm[0] = 127;
+                break;
+            case 1:
+                soft_pwm[1] = 0;
+        }
+//      (e == 0) ? soft_pwm[0] = 127 : soft_pwm[1] = 0;}
 #else
       soft_pwm[e] = (int)pid_output >> 1;
-#endif
+    }
     else
     {
       soft_pwm[e] = 0;
     }
+#endif // else LASER
 
     #ifdef WATCH_TEMP_PERIOD
     if(watchmillis[e] && millis() - watchmillis[e] > WATCH_TEMP_PERIOD)
@@ -922,6 +920,8 @@ void tp_init()
 
 #ifdef LASER
   laser_overheat = false;
+  target_temperature[0] = 100;
+  target_temperature[1] = 100;
 #endif
 }
 
@@ -1039,6 +1039,11 @@ void disable_heater()
 }
 
 void max_temp_error(uint8_t e) {
+
+#ifdef LASER
+  soft_pwm[e] = 255;  // need cool down; FAN and pump at full power
+  // TODO shutdown laser
+#else
   disable_heater();
   if(IsStopped() == false) {
     SERIAL_ERROR_START;
@@ -1049,6 +1054,7 @@ void max_temp_error(uint8_t e) {
   #ifndef BOGUS_TEMPERATURE_FAILSAFE_OVERRIDE
   Stop();
   #endif
+#endif // else LASER
 }
 
 void min_temp_error(uint8_t e) {

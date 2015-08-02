@@ -222,7 +222,7 @@
 // to check that the wiring to the thermistor is not broken.
 // Otherwise this would lead to the heater being powered on all the time.
 #define HEATER_0_MINTEMP 5
-#define HEATER_1_MINTEMP 30
+#define HEATER_1_MINTEMP 5
 #define HEATER_2_MINTEMP 5
 #define BED_MINTEMP 5
 
@@ -230,7 +230,7 @@
 // This feature exists to protect your hotend from overheating accidentally, but *NOT* from thermistor short/failure!
 // You should use MINTEMP for thermistor short/failure protection.
 #define HEATER_0_MAXTEMP 90
-#define HEATER_1_MAXTEMP 200
+#define HEATER_1_MAXTEMP 30
 #define HEATER_2_MAXTEMP 90
 #define BED_MAXTEMP 70
 
@@ -245,7 +245,7 @@
 
 // PID settings:
 // Comment the following line to disable PID and enable bang-bang.
-#define PIDTEMP
+//#define PIDTEMP
 #define BANG_MAX 255 // limits current to nozzle while in bang-bang mode; 255=full current
 #define PID_MAX 255 // limits current to nozzle while PID is active (see PID_FUNCTIONAL_RANGE below); 255=full current
 #ifdef PIDTEMP

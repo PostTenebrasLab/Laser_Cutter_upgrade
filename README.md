@@ -4,6 +4,29 @@ This project aims to improve a cheap Chinese 40W laser cutter, by making it easi
 
 ## Marlin modifications
 
+### control du Laser
+
+Marlin genere des pulses pour le moteurs. Pour aller d'un endroit à un autre à telle vitesse, il faut à 1KHz envoyer 
+une pulse toute les N ms. Pour chaque axe, la vitesse est différente et les pulses ont des longueurs différentes. 
+
+Pour le laser on a aussi besoin de pulse. En mode continu, on a besoin d'une pulse d'une durée egale au temps 
+de déplacement, pour le mode pulsé, on veut que le laser pulse à une certaine fréquence. Pour faire un déplacement 
+d = sqrt(dx²+dy²+dz²) il faut un certain temps et donc faire N pulses.
+
+L'axe E fait ça très bien. Marlin interprète E10 comme devant générer 10 pulses durant ce mouvement.
+
+#### modifications 
+
+Marlin utilise des accelerations et la seul chose à modifier est qu'en accélerant il faut ralentir les pulses 
+(pour qu'elles gardent la même fréquence) et vis et versa.
+
+  * il faut modifier les block dans planner; en mode continu E = 1 && mode pulse E = nb
+  * il faut aussi tenir compte des pulses incompletes dans une succession de block courts ça peut commencer
+    à poser des problèmes d'arrondi . On peut choisir un E > nb de pulse (une résolution 100x plus 
+    grande p.ex 0.32p + 5p + 0.47p) Et donc modifier les pulses p.ex; 32H + 100L + 5x (100H + 100B) + 47H.
+    Il faut aussi gérer les restes p.ex le block suivant 53H + 100L + ...
+ 
+ 
 ### control de temperature (manage_heater())
 
 Le principe serait de stopper le laser en cas de surchauffe. Il y a deux thermistors une avant le laser (bed) et 
@@ -26,12 +49,6 @@ reglage avec fanSpeed
 le fonctionnement de la airpump est proche de celle du FAN gestion par Gcode (M106/107) avec fanSpeed (0..255 attention
 Due utilise 12bits 0..4095)
 
-### Fonctionnement du Laser  
-
-Dans planner, plan_buffer_line() gère les accélérations et serait un bon candidat pour gérer l'allumage du laser
-
-voir si on peut l'intégrer dans la struct block_t. Marlin traite des blocks dans une FIFO (instruction de mouvement)
-pourquoi ne pas en profiter pour intégrer le contrôle du laser ?
 
 ### Emergency Stop
 

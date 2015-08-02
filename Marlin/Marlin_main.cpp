@@ -597,12 +597,8 @@ void loop()
     buflen = (buflen-1);
     bufindr = (bufindr + 1)%BUFSIZE;
   }
-  #ifdef LASER
-  laser.checkTemperatures();
-  #else
   //check heater every n milliseconds
   manage_heater();
-  #endif
   manage_inactivity();
 
   checkHitEndstops();
