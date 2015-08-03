@@ -221,7 +221,6 @@ extern float add_homeing[3];
 typedef enum {CONTINUOUS = 0, PULSED = 1, RASTER = 2} laser_e;
 extern bool laserArmed;
 extern laser_e laserMode;
-extern unsigned int laserPpm;
 extern float laserIntensity;
 #endif
 

@@ -99,7 +99,7 @@ bool autotemp_enabled=false;
 //===========================================================================
 //=================semi-private variables, used in inline  functions    =====
 //===========================================================================
-block_t block_buffer[BLOCK_BUFFER_SIZE];            // A ring buffer for motion instfructions
+block_t block_buffer[BLOCK_BUFFER_SIZE];            // A ring buffer for motion instructions
 volatile unsigned char block_buffer_head;           // Index of the next block to be pushed
 volatile unsigned char block_buffer_tail;           // Index of the block to process now
 
@@ -582,37 +582,25 @@ void plan_buffer_line(const float &x, const float &y, const float &z, const floa
 
   // Number of steps for each axis
 #ifndef COREXY
-// default non-h-bot planning
-block->steps_x = labs(target[X_AXIS]-position[X_AXIS]);
-block->steps_y = labs(target[Y_AXIS]-position[Y_AXIS]);
+  // default non-h-bot planning
+  block->steps_x = labs(target[X_AXIS]-position[X_AXIS]);
+  block->steps_y = labs(target[Y_AXIS]-position[Y_AXIS]);
 #else
-// corexy planning
-// these equations follow the form of the dA and dB equations on http://www.corexy.com/theory.html
-block->steps_x = labs((target[X_AXIS]-position[X_AXIS]) + (target[Y_AXIS]-position[Y_AXIS]));
-block->steps_y = labs((target[X_AXIS]-position[X_AXIS]) - (target[Y_AXIS]-position[Y_AXIS]));
+  // corexy planning
+  // these equations follow the form of the dA and dB equations on http://www.corexy.com/theory.html
+  block->steps_x = labs((target[X_AXIS]-position[X_AXIS]) + (target[Y_AXIS]-position[Y_AXIS]));
+  block->steps_y = labs((target[X_AXIS]-position[X_AXIS]) - (target[Y_AXIS]-position[Y_AXIS]));
 #endif
   block->steps_z = labs(target[Z_AXIS]-position[Z_AXIS]);
-//  #ifdef LASER
-//  switch(laserMode) {
-//    case CONTINUOUS:    // whatever the distance, always one pulse
-//      if(laserArmed)
-//        block->steps_e += 1;
-//      break;
-//    case PULSED:        // distance in mm * points per millimeter
-//      if(laserArmed)
-//        laserArmed = true;
-////        block->steps_e = laser.ppm * sqrt(square(delta_mm[X_AXIS]) + square(delta_mm[Y_AXIS]) + square(delta_mm[Z_AXIS]));
-//      break;
-//    case RASTER:
-//      break;
-//  }
-//  #else
+#ifdef LASER  // block->steps_e will be overwrite later depend on laser mode
+  block->step_event_count = max(block->steps_x, max(block->steps_y, block->steps_z));
+#else
   block->steps_e = labs(target[E_AXIS]-position[E_AXIS]);
   block->steps_e *= volumetric_multiplier[active_extruder];
   block->steps_e *= extrudemultiply;
   block->steps_e /= 100;
-//  #endif
   block->step_event_count = max(block->steps_x, max(block->steps_y, max(block->steps_z, block->steps_e)));
+#endif  // LASER
 
   // Bail if this is a zero-length block
   if (block->step_event_count <= dropsegments)
@@ -651,7 +639,7 @@ block->steps_y = labs((target[X_AXIS]-position[X_AXIS]) - (target[Y_AXIS]-positi
   {
     block->direction_bits |= (1<<Z_AXIS); 
   }
-  if (target[E_AXIS] < position[E_AXIS])
+  if (target[E_AXIS] < position[E_AXIS])  // for laser always positive based on abs(distance)
   {
     block->direction_bits |= (1<<E_AXIS); 
   }
@@ -674,7 +662,7 @@ block->steps_y = labs((target[X_AXIS]-position[X_AXIS]) - (target[Y_AXIS]-positi
 #endif
 
   // Enable extruder(s)
-  if(block->steps_e != 0)
+  if((block->steps_e != 0) && laserArmed)
   {
     if (DISABLE_INACTIVE_EXTRUDER) //enable only selected extruder
     {
@@ -713,20 +701,23 @@ block->steps_y = labs((target[X_AXIS]-position[X_AXIS]) - (target[Y_AXIS]-positi
     delta_mm[Y_AXIS] = ((target[X_AXIS]-position[X_AXIS]) - (target[Y_AXIS]-position[Y_AXIS]))/axis_steps_per_unit[Y_AXIS];
   #endif
   delta_mm[Z_AXIS] = (target[Z_AXIS]-position[Z_AXIS])/axis_steps_per_unit[Z_AXIS];
+#ifdef LASER
+  block->millimeters = sqrt(square(delta_mm[X_AXIS]) + square(delta_mm[Y_AXIS]) + square(delta_mm[Z_AXIS]));
+  delta_mm[E_AXIS] = block->millimeters;
+  block->steps_e = delta_mm[E_AXIS] * axis_steps_per_unit[E_AXIS];  // we use pulses by mm depending on abs move distance
+#else
   delta_mm[E_AXIS] = ((target[E_AXIS]-position[E_AXIS])/axis_steps_per_unit[E_AXIS])*volumetric_multiplier[active_extruder]*extrudemultiply/100.0;
   if ( block->steps_x <=dropsegments && block->steps_y <=dropsegments && block->steps_z <=dropsegments )
   {
-    #ifdef LASER
-    //TODO prevent fire laser without moving
-    #else
     block->millimeters = fabs(delta_mm[E_AXIS]);
-    #endif  // LASER
-  } 
+  }
   else
   {
     block->millimeters = sqrt(square(delta_mm[X_AXIS]) + square(delta_mm[Y_AXIS]) + square(delta_mm[Z_AXIS]));
   }
-  float inverse_millimeters = 1.0/block->millimeters;  // Inverse millimeters to remove multiple divides 
+#endif
+
+  float inverse_millimeters = 1.0/block->millimeters;  // Inverse millimeters to remove multiple divides
 
     // Calculate speed in mm/second for each axis. No divide by zero due to previous checks.
   float inverse_second = feed_rate * inverse_millimeters;
@@ -933,7 +924,7 @@ block->steps_y = labs((target[X_AXIS]-position[X_AXIS]) - (target[Y_AXIS]-positi
   memcpy(previous_speed, current_speed, sizeof(previous_speed)); // previous_speed[] = current_speed[]
   previous_nominal_speed = block->nominal_speed;
 
-
+// TODO check how it impact laser
 #ifdef ADVANCE
   // Calculate advance rate
   if((block->steps_e == 0) || (block->steps_x == 0 && block->steps_y == 0 && block->steps_z == 0)) {

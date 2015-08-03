@@ -1042,8 +1042,16 @@ void max_temp_error(uint8_t e) {
 
 #ifdef LASER
     soft_pwm[e] = 255;  // need cool down; FAN and pump at full power
-//    laser.armed = false;
-  // TODO shutdown laser
+    if(e == 0) {
+        if(IsStopped() == false) {
+            SERIAL_ERROR_START;
+            SERIAL_ERRORLN((int)e);
+            SERIAL_ERRORLNPGM(": Laser switched off. MAXTEMP triggered !");
+            LCD_ALERTMESSAGEPGM("Err: MAXTEMP");
+        }
+        laserArmed = false;
+        Stop();
+    }
 #else
   disable_heater();
   if(IsStopped() == false) {

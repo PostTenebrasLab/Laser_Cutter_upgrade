@@ -291,7 +291,7 @@ int EtoPPressure=0;
 #ifdef LASER
 bool laserArmed;
 laser_e laserMode;
-unsigned int laserPpm;
+extern float axis_steps_per_unit[4];  // laser ppm axis_steps_per_unit[3]
 float laserIntensity;
 #endif
 
@@ -1219,7 +1219,7 @@ void process_commands()
         #endif //FWRETRACT
         #ifdef LASER
         if (code_seen('S') && !IsStopped()) laserIntensity = ((float) code_value());
-        if (code_seen('L') && !IsStopped()) laserPpm = ((unsigned int) labs(code_value()));
+        if (code_seen('L') && !IsStopped()) axis_steps_per_unit[E_AXIS] = ((float) labs(code_value()));
         if (code_seen('B') && !IsStopped()) laserMode = ((laser_e) code_value());
         laserArmed = true;
         #endif
@@ -1863,7 +1863,7 @@ void process_commands()
 #ifdef LASER_FIRE_SPINDLE
     case 3:  //M3 - fire laser
       if (code_seen('S') && !IsStopped()) laserIntensity = (float) code_value();
-      if (code_seen('L') && !IsStopped()) laserPpm = (unsigned int) labs(code_value());
+      if (code_seen('L') && !IsStopped()) axis_steps_per_unit[E_AXIS] = ((float) labs(code_value()));
       if (code_seen('B') && !IsStopped()) laserMode((laser_e) code_value());
 
       laserArmed = true;
@@ -3170,7 +3170,7 @@ void process_commands()
 	case 649: // M649 set laser options
 	{
 	  if (code_seen('S') && !IsStopped()) laserIntensity = ((float) code_value());
-      if (code_seen('L') && !IsStopped()) laserPpm = ((unsigned int) labs(code_value()));
+      if (code_seen('L') && !IsStopped()) axis_steps_per_unit[E_AXIS] = ((float) labs(code_value()));
       if (code_seen('B') && !IsStopped()) laserMode = ((laser_e) code_value());
       if (code_seen('F')) {
         next_feedrate = code_value();

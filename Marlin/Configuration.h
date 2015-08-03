@@ -130,7 +130,7 @@
 // G mode       = 0 // fire the laser on a G1 move, extinguish when the move ends
 // SPINDLE mode = 1 // fire the laser on M3, extinguish on M5
 // E mode       = 2 // fire the laser when the E axis moves
-#define LASER_FIRE_MODE 0
+// #define LASER_FIRE_MODE 0
 
 // water cooling
 #define LASER_PUMP
@@ -143,11 +143,6 @@
 #define LASER_MAX_RASTER_LINE 68 // maximum number of base64 encoded pixels per raster gcode command
 #define LASER_RASTER_ASPECT_RATIO 1.33 // pixels aren't square on most displays, 1.33 == 4:3 aspect ratio
 #define LASER_RASTER_MM_PER_PULSE 0.2
-
-//// Uncomment the following if the laser cutter is equipped with a peripheral relay board
-//// to control power to an exhaust fan, water pump, laser power supply, etc.
-//#define LASER_PERIPHERALS
-//#define LASER_PERIPHERALS_TIMEOUT 30000  // Number of milliseconds to wait for status signal from peripheral control board
 
 //// Uncomment the following line to enable cubic bezier curve movement with the G5 code
 // #define G5_BEZIER
