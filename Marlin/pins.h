@@ -37,8 +37,6 @@
   // Use 1k thermistor tables
 #endif
 
-// TODO assign PIN for FAN, ()_MAX_PIN,...
-
 #define X_STEP_PIN         63   // AD9
 #define X_DIR_PIN          62   // AD8
 #define X_ENABLE_PIN       48
@@ -57,6 +55,7 @@
 #define Z_MIN_PIN          26
 #define Z_MAX_PIN          34
 
+// TODO use Z pins to fire laser and intensity (DAC)
 #define E0_STEP_PIN        36
 #define E0_DIR_PIN         28
 #define E0_ENABLE_PIN      42
@@ -95,7 +94,6 @@
 #define HEATER_3_PIN       -1   // FET5 extra MOSFET    (12)
 #define HEATER_4_PIN       -1    // FET6 extra MOSFET   (2)
 
-// TODO check 4 thermo numbers AD0-AD3
 #define TEMP_BED_PIN       A0  // AD0 ANALOG NUMBERING AD0 = 54 = PA16(SAM3X)
 #define TEMP_0_PIN         A1  // AD0 ANALOG NUMBERING
 #define TEMP_1_PIN         A2  // AD1 ANALOG NUMBERING

@@ -550,7 +550,7 @@ void plan_buffer_line(const float &x, const float &y, const float &z, const floa
   long target[4];
   target[X_AXIS] = lround(x*axis_steps_per_unit[X_AXIS]);
   target[Y_AXIS] = lround(y*axis_steps_per_unit[Y_AXIS]);
-  target[Z_AXIS] = lround(z*axis_steps_per_unit[Z_AXIS]);     
+  target[Z_AXIS] = lround(z*axis_steps_per_unit[Z_AXIS]);
   target[E_AXIS] = lround(e*axis_steps_per_unit[E_AXIS]);
 
   #ifdef PREVENT_DANGEROUS_EXTRUDE
@@ -592,10 +592,26 @@ block->steps_x = labs((target[X_AXIS]-position[X_AXIS]) + (target[Y_AXIS]-positi
 block->steps_y = labs((target[X_AXIS]-position[X_AXIS]) - (target[Y_AXIS]-position[Y_AXIS]));
 #endif
   block->steps_z = labs(target[Z_AXIS]-position[Z_AXIS]);
+//  #ifdef LASER
+//  switch(laserMode) {
+//    case CONTINUOUS:    // whatever the distance, always one pulse
+//      if(laserArmed)
+//        block->steps_e += 1;
+//      break;
+//    case PULSED:        // distance in mm * points per millimeter
+//      if(laserArmed)
+//        laserArmed = true;
+////        block->steps_e = laser.ppm * sqrt(square(delta_mm[X_AXIS]) + square(delta_mm[Y_AXIS]) + square(delta_mm[Z_AXIS]));
+//      break;
+//    case RASTER:
+//      break;
+//  }
+//  #else
   block->steps_e = labs(target[E_AXIS]-position[E_AXIS]);
   block->steps_e *= volumetric_multiplier[active_extruder];
   block->steps_e *= extrudemultiply;
   block->steps_e /= 100;
+//  #endif
   block->step_event_count = max(block->steps_x, max(block->steps_y, max(block->steps_z, block->steps_e)));
 
   // Bail if this is a zero-length block
@@ -677,6 +693,7 @@ block->steps_y = labs((target[X_AXIS]-position[X_AXIS]) - (target[Y_AXIS]-positi
     }
   }
 
+  #ifndef LASER
   if (block->steps_e == 0)
   {
     if(feed_rate<mintravelfeedrate) feed_rate=mintravelfeedrate;
@@ -684,7 +701,8 @@ block->steps_y = labs((target[X_AXIS]-position[X_AXIS]) - (target[Y_AXIS]-positi
   else
   {
     if(feed_rate<minimumfeedrate) feed_rate=minimumfeedrate;
-  } 
+  }
+  #endif
 
   float delta_mm[4];
   #ifndef COREXY
@@ -698,7 +716,11 @@ block->steps_y = labs((target[X_AXIS]-position[X_AXIS]) - (target[Y_AXIS]-positi
   delta_mm[E_AXIS] = ((target[E_AXIS]-position[E_AXIS])/axis_steps_per_unit[E_AXIS])*volumetric_multiplier[active_extruder]*extrudemultiply/100.0;
   if ( block->steps_x <=dropsegments && block->steps_y <=dropsegments && block->steps_z <=dropsegments )
   {
+    #ifdef LASER
+    //TODO prevent fire laser without moving
+    #else
     block->millimeters = fabs(delta_mm[E_AXIS]);
+    #endif  // LASER
   } 
   else
   {
@@ -789,6 +811,10 @@ block->steps_y = labs((target[X_AXIS]-position[X_AXIS]) - (target[Y_AXIS]-positi
     {
       current_speed[i] *= speed_factor;
     }
+    #ifdef LASER
+    /* laser pulse need to be constant; if we increase speed so extend pulses length */
+    current_speed[4] /= speed_factor*speed_factor;
+    #endif
     block->nominal_speed *= speed_factor;
     block->nominal_rate *= speed_factor;
   }

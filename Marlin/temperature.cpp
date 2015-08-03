@@ -487,15 +487,15 @@ void manage_heater()
     // Check if temperature is within the correct range
     if((current_temperature[e] > minttemp[e]) && (current_temperature[e] < maxttemp[e])) {
 #ifdef LASER
-        switch(e)
-        {
+        switch (e) {
             case 0:
                 soft_pwm[0] = 127;
                 break;
             case 1:
                 soft_pwm[1] = 0;
+                break;
         }
-//      (e == 0) ? soft_pwm[0] = 127 : soft_pwm[1] = 0;}
+    }
 #else
       soft_pwm[e] = (int)pid_output >> 1;
     }
@@ -1041,7 +1041,8 @@ void disable_heater()
 void max_temp_error(uint8_t e) {
 
 #ifdef LASER
-  soft_pwm[e] = 255;  // need cool down; FAN and pump at full power
+    soft_pwm[e] = 255;  // need cool down; FAN and pump at full power
+//    laser.armed = false;
   // TODO shutdown laser
 #else
   disable_heater();
@@ -1443,7 +1444,7 @@ HAL_TEMP_TIMER_ISR
         min_temp_error(2);
     }
 #endif
-  
+
   /* No bed MINTEMP error? */
 #if defined(BED_MAXTEMP) && (TEMP_SENSOR_BED != 0)
 # if HEATER_BED_RAW_LO_TEMP > HEATER_BED_RAW_HI_TEMP
@@ -1456,7 +1457,7 @@ HAL_TEMP_TIMER_ISR
     }
 #endif
   }
-  
+
 #ifdef BABYSTEPPING
   for(uint8_t axis=0;axis<3;axis++)
   {

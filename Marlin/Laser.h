@@ -25,7 +25,7 @@
 
 extern volatile unsigned long frequence;
 
-typedef enum {CONTINUOUS = 0, PULSED = 1, RASTER = 2} laser_e;
+//typedef enum {CONTINUOUS = 0, PULSED = 1, RASTER = 2} laser_e;
 
 typedef struct {
   uint8_t nbr        :6 ;             // a pin number from 0 to 63
