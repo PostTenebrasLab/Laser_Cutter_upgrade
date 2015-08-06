@@ -651,17 +651,29 @@ HAL_STEP_TIMER_ISR
         #endif
       }
 
-      #ifndef ADVANCE
+#ifndef ADVANCE
         counter_e += current_block->steps_e;
         if (counter_e > 0) {
           WRITE_E_STEP(!INVERT_E_STEP_PIN);
           counter_e -= current_block->step_event_count;
           count_position[E_AXIS]+=count_direction[E_AXIS];
-          WRITE_E_STEP(INVERT_E_STEP_PIN);
+          // TODO add a pulse length for laser not only HIGH/LOW pulse
+#ifdef  LASER
+          if(laserMode != CONTINUOUS)
+            WRITE_E_STEP(INVERT_E_STEP_PIN);
+#else
+
+            WRITE_E_STEP(INVERT_E_STEP_PIN);
+#endif  // LASER
         }
-      #endif //!ADVANCE
+#endif //!ADVANCE
       step_events_completed += 1;
-      if(step_events_completed >= current_block->step_event_count) break;
+      if(step_events_completed >= current_block->step_event_count) {
+#ifdef LASER
+        WRITE_E_STEP(INVERT_E_STEP_PIN);  // turn laser off at events_completed just in case
+#endif
+        break;
+      }
     }
     // Calculare new timer value
     unsigned long timer;

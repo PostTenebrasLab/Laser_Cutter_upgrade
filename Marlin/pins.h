@@ -49,15 +49,18 @@
 #define Y_MIN_PIN          24
 #define Y_MAX_PIN          38
 
-#define Z_STEP_PIN         32   // for Z use 67,AD13
-#define Z_DIR_PIN          47   // for Z use 66, AD12
-#define Z_ENABLE_PIN       45   // for Z use 44
+#define Z_STEP_PIN         32   // Z stepper has been switched with E2
+#define Z_DIR_PIN          47
+#define Z_ENABLE_PIN       45
 #define Z_MIN_PIN          26
 #define Z_MAX_PIN          34
 
 // TODO use Z pins to fire laser and intensity (DAC)
-#define E0_STEP_PIN        36
-#define E0_DIR_PIN         28
+// E0 output use Z position on RAMPS-FD (Z == laser enable/intensity )
+// Z output use E2 position on RAMPS-FD (E2 == Z stepper)
+// E2 is disabled - no need
+#define E0_STEP_PIN        A13 // 36, used for enable laser
+#define E0_DIR_PIN         A12 // 28, choose this pin or next one for laser intensity (DAC0)
 #define E0_ENABLE_PIN      42
 
 #define E1_STEP_PIN        43
