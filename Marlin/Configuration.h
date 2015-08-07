@@ -134,6 +134,8 @@
 
 // water cooling
 #define LASER_PUMP
+#define MIN_PUMP_POWER  50 // water cooling minimum pump power (0..255)
+#define DELTA_TEMP_MAX  10 // delta temperature between water cooling thermistors
 
 // beam air flow
 #define LASER_FAN

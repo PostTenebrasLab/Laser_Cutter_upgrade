@@ -487,15 +487,19 @@ void manage_heater()
     // Check if temperature is within the correct range
     if((current_temperature[e] > minttemp[e]) && (current_temperature[e] < maxttemp[e])) {
 #ifdef LASER
+        float d = labs(current_temperature[1]-current_temperature[0]);
+
+        (d > DELTA_TEMP_MAX)? d = 1.0 : d = d/DELTA_TEMP_MAX;
+
         switch(e)
         {
             case 0:
-                soft_pwm[0] = 127;
+                // min_power + (0..1)*(255-min_power)  ; max when
+                soft_pwm[0] = MIN_PUMP_POWER + (int)(d*(255-MIN_PUMP_POWER));
                 break;
             case 1:
                 soft_pwm[1] = 0;
         }
-//      (e == 0) ? soft_pwm[0] = 127 : soft_pwm[1] = 0;}
 #else
       soft_pwm[e] = (int)pid_output >> 1;
     }
@@ -623,6 +627,7 @@ void manage_heater()
       }
     #endif
   #endif
+}
 }
 
 #define PGM_RD_W(x)   (short)pgm_read_word(&x)
@@ -1041,8 +1046,17 @@ void disable_heater()
 void max_temp_error(uint8_t e) {
 
 #ifdef LASER
-  soft_pwm[e] = 255;  // need cool down; FAN and pump at full power
-  // TODO shutdown laser
+  soft_pwm[e] = 255;  // need cooling down; FAN and pump at full power
+  if(e == 0) {
+      if (IsStopped() == false) {
+          SERIAL_ERROR_START;
+          SERIAL_ERRORLN((int) e);
+          SERIAL_ERRORLNPGM(": Laser switched off. MAXTEMP triggered !");
+          LCD_ALERTMESSAGEPGM("Err: MAXTEMP");
+      }
+//      laserArmed = false;
+      Stop();
+  }
 #else
   disable_heater();
   if(IsStopped() == false) {
