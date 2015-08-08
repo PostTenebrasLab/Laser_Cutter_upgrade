@@ -135,6 +135,7 @@
 // water cooling
 #define LASER_PUMP
 #define MIN_PUMP_POWER  50 // water cooling minimum pump power (0..255)
+#define WATER_TEMPERATURE 22 // cold water temperature
 #define DELTA_TEMP_MAX  10 // delta temperature between water cooling thermistors
 
 // beam air flow
@@ -320,7 +321,7 @@
 //if PREVENT_DANGEROUS_EXTRUDE is on, you can still disable (uncomment) very long bits of extrusion separately.
 //#define PREVENT_LENGTHY_EXTRUDE
 
-#define EXTRUDE_MINTEMP 170
+#define EXTRUDE_MINTEMP 20
 #define EXTRUDE_MAXLENGTH (X_MAX_LENGTH+Y_MAX_LENGTH) //prevent extrusion of very large distances.
 
 /*================== Thermal Runaway Protection ==============================
