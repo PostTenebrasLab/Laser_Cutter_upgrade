@@ -51,23 +51,23 @@
 #define Y_MIN_PIN          24
 #define Y_MAX_PIN          38
 
-#define Z_STEP_PIN         32   // for Z use 67,AD13
-#define Z_DIR_PIN          47   // for Z use 66, AD12
-#define Z_ENABLE_PIN       45   // for Z use 44
+#define Z_STEP_PIN         32   // original Z wiring use 67, AD13
+#define Z_DIR_PIN          47   // original Z wiring use 66, AD12
+#define Z_ENABLE_PIN       45   // original Z wiring use 44
 #define Z_MIN_PIN          26
 #define Z_MAX_PIN          34
 
-#define E0_STEP_PIN        66   //36
-#define E0_DIR_PIN         67   //28
-#define E0_ENABLE_PIN      44   //42
+#define E0_STEP_PIN        66   // original E0 wiring use 36
+#define E0_DIR_PIN         67   // original E0 wiring use 28
+#define E0_ENABLE_PIN      44   // original E0 wiring use 42
 
 #define E1_STEP_PIN        43
 #define E1_DIR_PIN         41
 #define E1_ENABLE_PIN      39
 
-#define E2_STEP_PIN        -1 //32
-#define E2_DIR_PIN         -1 //47
-#define E2_ENABLE_PIN      -1 //45
+#define E2_STEP_PIN        -1 // original E2 wiring use 32
+#define E2_DIR_PIN         -1 // original E2 wiring use 47
+#define E2_ENABLE_PIN      -1 // original E2 wiring use 45
 
 #define SDPOWER            -1
 #define SDSS               4

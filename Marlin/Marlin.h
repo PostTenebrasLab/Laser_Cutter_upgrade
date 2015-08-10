@@ -155,8 +155,13 @@ void manage_inactivity();
 #endif
 
 #if defined(E0_ENABLE_PIN) && (E0_ENABLE_PIN > -1)
+#ifdef LASER
   #define enable_e0() WRITE(E0_ENABLE_PIN, !E_ENABLE_ON)
   #define disable_e0() WRITE(E0_ENABLE_PIN,E_ENABLE_ON)
+#else
+  #define enable_e0() WRITE(E0_ENABLE_PIN, E_ENABLE_ON)
+  #define disable_e0() WRITE(E0_ENABLE_PIN,!E_ENABLE_ON)
+#endif // LASER
 #else
   #define enable_e0()  /* nothing */
   #define disable_e0() /* nothing */
@@ -216,6 +221,14 @@ extern int extruder_multiply[EXTRUDERS]; // sets extrude multiply factor (in per
 extern float volumetric_multiplier[EXTRUDERS]; // reciprocal of cross-sectional area of filament (in square millimeters), stored this way to reduce computational burden in planner
 extern float current_position[NUM_AXIS] ;
 extern float add_homeing[3];
+
+#ifdef LASER
+typedef enum {CONTINUOUS = 0, PULSED = 1, RASTER = 2} laser_e;
+extern bool laserArmed;
+extern laser_e laserMode;
+extern float laserIntensity;
+#endif
+
 #ifdef DELTA
 extern float endstop_adj[3];
 extern float delta_radius;

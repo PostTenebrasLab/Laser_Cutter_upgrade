@@ -39,7 +39,6 @@
 #include "ultralcd.h"
 #include "planner.h"
 #include "stepper.h"
-#include "Laser.h"
 #include "temperature.h"
 #include "motion_control.h"
 #include "cardreader.h"
@@ -56,10 +55,6 @@
 
 #if NUM_SERVOS > 0
 #include "Servo.h"
-#endif
-
-#ifdef LASER
-Laser laser;
 #endif
 
 #ifdef LASER_RASTER
@@ -291,6 +286,12 @@ int EtoPPressure=0;
   float delta_diagonal_rod_2= sq(delta_diagonal_rod);
   float delta_segments_per_second= DELTA_SEGMENTS_PER_SECOND;
 #endif					
+
+#ifdef LASER
+bool laserArmed;
+laser_e laserMode;
+float laserIntensity;
+#endif
 
 bool cancel_heatup = false ;
 
@@ -1214,12 +1215,12 @@ void process_commands()
             }
           #endif //FWRETRACT
 
-        #ifdef LASER_FIRE_G1
-        if (code_seen('S') && !IsStopped()) laser.setIntensity((float) code_value());
-        if (code_seen('L') && !IsStopped()) laser.setDuration((float) labs(code_value()));
-        if (code_seen('B') && !IsStopped()) laser.setMode((laser_e) code_value());
-        laser.fireOn();
-        #endif // LASER_FIRE_G1
+        #ifdef LASER
+        if (code_seen('S') && !IsStopped()) laserIntensity = (float) code_value();
+        if (code_seen('B') && !IsStopped()) laserMode = (laser_e) code_value();
+        laserArmed = true;
+        #endif // LASER
+
         #ifdef FWRETRACT
         if(autoretract_enabled)
         if( !(code_seen('X') || code_seen('Y') || code_seen('Z')) && code_seen('E')) {
@@ -1232,11 +1233,11 @@ void process_commands()
           }
         }
         #endif //FWRETRACT
-        prepare_move();
 
-        #ifdef LASER_FIRE_G1
-        laser.status = LASER_OFF;   // turn the laser off after the move
-        #endif // LASER_FIRE_G1
+        prepare_move();
+        #ifdef LASER
+        laserArmed = false;
+        #endif
         //ClearToSend();
         return;
       }
@@ -1245,18 +1246,17 @@ void process_commands()
       if(Stopped == false) {
         get_arc_coordinates();
 
-        #ifdef LASER_FIRE_G1
-        if (code_seen('S') && !IsStopped()) laser.setIntensity((float) code_value());
-        if (code_seen('L') && !IsStopped()) laser.setDuration((float) labs(code_value()));
-        if (code_seen('B') && !IsStopped()) laser.setMode((laser_e) code_value());
-        laser.fireOn();
+        #ifdef LASER
+        if (code_seen('S') && !IsStopped()) laserIntensity = (float) code_value();
+        if (code_seen('B') && !IsStopped()) laserMode = (laser_e) code_value();
+        laserArmed = true;
         #endif // LASER_FIRE_G1
 
         prepare_arc_move(true);
 
-        #ifdef LASER_FIRE_G1
-          laser.status = LASER_OFF;
-        #endif // LASER_FIRE_G1
+        #ifdef LASER
+        laserArmed = false;
+        #endif // LASER
 
         return;
       }
@@ -1266,17 +1266,16 @@ void process_commands()
         get_arc_coordinates();
 
         #ifdef LASER_FIRE_G1
-        if (code_seen('S') && !IsStopped()) laser.setIntensity((float) code_value());
-        if (code_seen('L') && !IsStopped()) laser.setDuration((float) labs(code_value()));
-        if (code_seen('B') && !IsStopped()) laser.setMode((laser_e) code_value());
-        laser.fireOn();
+        if (code_seen('S') && !IsStopped()) laserIntensity = (float) code_value();
+        if (code_seen('B') && !IsStopped()) laserMode = (laser_e) code_value();
+        laserArmed = true;
         #endif // LASER_FIRE_G1
 
         prepare_arc_move(false);
 
-        #ifdef LASER_FIRE_G1
-          laser.status = LASER_OFF;
-        #endif // LASER_FIRE_G1
+        #ifdef LASER
+        laserArmed = false;
+        #endif // LASER
 
         return;
       }
@@ -1895,26 +1894,20 @@ void process_commands()
     }
     break;
 #endif
-#ifdef LASER_FIRE_SPINDLE
+#ifdef LASER
     case 3:  //M3 - fire laser
-      if (code_seen('S') && !IsStopped()) laser.intensity = (float) code_value();
-      if (code_seen('L') && !IsStopped()) laser.duration = (unsigned long) labs(code_value());
-      if (code_seen('P') && !IsStopped()) laser.ppm = (float) code_value();
-      if (code_seen('D') && !IsStopped()) laser.diagnostics = (bool) code_value();
-      if (code_seen('B') && !IsStopped()) laser_set_mode((laser_e) code_value());
-
-      laser.status = LASER_ON;
-      laser.fired = LASER_FIRE_SPINDLE;
+      if (code_seen('S') && !IsStopped()) laserIntensity = (float) code_value();
+      if (code_seen('B') && !IsStopped()) laserMode = (laser_e) code_value();
+      laserArmed = true;
       //lcd_update();
-
       prepare_move();
       break;
     case 5:  //M5 stop firing laser
-	  laser.status = LASER_OFF;
-          lcd_update();
+      laserArmed = false;
+//      lcd_update();
 	  prepare_move();
       break;
-#endif // LASER_FIRE_SPINDLE
+#endif // LASER
     case 17:
         LCD_MESSAGEPGM(MSG_NO_MOVE);
         enable_x();
@@ -3208,11 +3201,8 @@ void process_commands()
 	#ifdef LASER
 	case 649: // M649 set laser options
 	{
-	  if (code_seen('S') && !IsStopped()) laser.setIntensity((float) code_value());
-//          laser.rasterlaserpower =  laser.intensity;
-      if (code_seen('L') && !IsStopped()) laser.setDuration((float) labs(code_value()));
-      if (code_seen('B') && !IsStopped()) laser.setMode((laser_e) code_value());
-//      if (code_seen('R') && !IsStopped()) laser.raster_mm_per_pulse = ((float) code_value());
+	  if (code_seen('S') && !IsStopped()) laserIntensity = (float) code_value();
+      if (code_seen('B') && !IsStopped()) laserMode = (laser_e) code_value();
       if (code_seen('F')) {
         next_feedrate = code_value();
         if(next_feedrate > 0.0) feedrate = next_feedrate;
@@ -3641,20 +3631,9 @@ void prepare_move()
   }
 #endif //DUAL_X_CARRIAGE
 
-  // TODO change LASER_FIRE_E in prepare_move()
-#ifdef LASER_FIRE_E
-  if (current_position[E_AXIS] != destination[E_AXIS] && ((current_position[X_AXIS] != destination [X_AXIS]) || (current_position[Y_AXIS] != destination [Y_AXIS]) || (current_position[Z_AXIS] != destination [Z_AXIS]) )){
-	laser.status = LASER_ON;
-	laser.fired = LASER_FIRE_E;
-  }
-  if (current_position[E_AXIS] == destination[E_AXIS] && laser.fired == LASER_FIRE_E){
-    laser.status = LASER_OFF;
-  }
-#endif // LASER_FIRE_E
-
-
   // Do not use feedmultiply for E or Z only moves
   if( (current_position[X_AXIS] == destination [X_AXIS]) && (current_position[Y_AXIS] == destination [Y_AXIS])) {
+      laserArmed = false; // avoid in place laser firing
       plan_buffer_line(destination[X_AXIS], destination[Y_AXIS], destination[Z_AXIS], destination[E_AXIS], feedrate/60, active_extruder);
   }
   else {
@@ -3848,8 +3827,7 @@ void kill()
   disable_e2();
 
   #ifdef LASER
-  laser.fireOff();
-  laser.reset();
+  laserArmed = false;
   #endif // LASER
 
 #if defined(PS_ON_PIN) && PS_ON_PIN > -1
@@ -3866,11 +3844,8 @@ void Stop()
 {
 
 #ifdef LASER
-  laser.fireOff();
-  laser.reset();
-  #ifdef DEBUG_LASER
-    SERIAL_ECHOLN("Laser set to off, stop() called");
-  #endif
+  disable_e0();
+  laserArmed = false;
 #else
   disable_heater();
 #endif

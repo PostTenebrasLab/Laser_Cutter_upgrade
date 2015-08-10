@@ -26,9 +26,9 @@
 
 #include "Marlin.h"
 
-#ifdef LASER
-#include "Laser.h"
-#endif
+//#ifdef LASER
+//#include "Laser.h"
+//#endif
 
 #ifdef ENABLE_AUTO_BED_LEVELING
 #include "vector_3.h"

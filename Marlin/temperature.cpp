@@ -487,17 +487,17 @@ void manage_heater()
     // Check if temperature is within the correct range
     if((current_temperature[e] > minttemp[e]) && (current_temperature[e] < maxttemp[e])) {
 #ifdef LASER
-        float d = labs(current_temperature[1]-current_temperature[0]);
 
-        (d > DELTA_TEMP_MAX)? d = 1.0 : d = d/DELTA_TEMP_MAX;
-
+        // constant proportional to delta temp (before and after laser)
+        float Kp = 1.0 + labs(current_temperature[1]-current_temperature[0])/DELTA_TEMP_MAX;
+        // constant proportional to temp
+        Kp *= 1.0 + current_temperature[0]-minttemp[0]/maxttemp[0];
         switch(e)
         {
-            case 0:
-                // min_power + (0..1)*(255-min_power)  ; max when
-                soft_pwm[0] = MIN_PUMP_POWER + (int)(d*(255-MIN_PUMP_POWER));
+            case 0:  // water pump always run from MIN_PUMP_POWER to max depend on error
+                (Kp > (255/MIN_PUMP_POWER-1.0))? soft_pwm[0] = 255 : soft_pwm[0] = (int)(Kp*MIN_PUMP_POWER);
                 break;
-            case 1:
+            case 1:  // tower fan turned on when > maxttemp
                 soft_pwm[1] = 0;
         }
 #else
@@ -1054,7 +1054,7 @@ void max_temp_error(uint8_t e) {
           SERIAL_ERRORLNPGM(": Laser switched off. MAXTEMP triggered !");
           LCD_ALERTMESSAGEPGM("Err: MAXTEMP");
       }
-//      laserArmed = false;
+      laserArmed = false;
       Stop();
   }
 #else
