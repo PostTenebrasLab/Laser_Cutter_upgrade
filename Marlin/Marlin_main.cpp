@@ -555,6 +555,14 @@ void setup()
     digipot_i2c_init();
   #endif
 
+  #ifdef LASER
+  pinMode(FLOW_METER_PIN, INPUT);
+  pinMode(RED_DOT_LASER, OUTPUT);
+  pinMode(RED_CROSS_LASER, OUTPUT);
+  WRITE(RED_DOT_LASER,HIGH);
+  WRITE(RED_CROSS_LASER,HIGH);
+  #endif
+
 }
 
 

@@ -76,7 +76,10 @@
 #define BEEPER             -1
 #define FAN_PIN            11
 
-#define FLOW_METER_PIN     58
+#define FLOW_METER_PIN     A4
+#define RED_DOT_LASER      A5
+#define RED_CROSS_LASER    A6
+
 
 // TODO add laser line pin (red light for Z alignment)
 
