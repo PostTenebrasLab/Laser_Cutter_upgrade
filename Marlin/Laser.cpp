@@ -38,19 +38,19 @@
 
 uint8_t LaserCount = 0;
 
-volatile unsigned long lastTime;
-volatile unsigned long frequence;
+//volatile unsigned long lastTime;
+//volatile unsigned long frequence;
 extern void updateTemperaturesFromRawValues();
 extern float current_temperature[EXTRUDERS];
 extern float current_temperature_bed;
 
-void measureFlow(){
-
-    /* weighted average of last measure and new one */
-    frequence = 1000 * (frequence + 1) / (1000 + millis() - lastTime);
-    lastTime = millis();
-
-}
+//void measureFlow(){
+//
+//    /* weighted average of last measure and new one */
+//    frequence = 1000 * (frequence + 1) / (1000 + millis() - lastTime);
+//    lastTime = millis();
+//
+//}
 
 
 /* laser constructor */

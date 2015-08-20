@@ -74,6 +74,8 @@ unsigned char soft_pwm_bed;
 
 #ifdef LASER
 bool laser_overheat;
+volatile unsigned long lastTime;
+volatile unsigned long frequence = 0;
 #endif
 
 //===========================================================================
@@ -333,7 +335,15 @@ void updatePID()
   temp_iState_max_bed = PID_INTEGRAL_DRIVE_MAX / bedKi;  
 #endif
 }
-  
+
+void measureFlow(){
+
+  /* weighted average of last measure and new one */
+  frequence = 1000 * (frequence + 1) / (1000 + millis() - lastTime);
+  lastTime = millis();
+
+}
+
 int getHeaterPower(int heater) {
 	if (heater<0)
 		return soft_pwm_bed;
@@ -927,6 +937,11 @@ void tp_init()
   laser_overheat = false;
   target_temperature[0] = 100;
   target_temperature[1] = 100;
+#if defined(FLOW_METER_PIN) && (FLOW_METER_PIN > -1)
+  SET_INPUT(FLOW_METER_PIN);
+  lastTime = millis();
+  attachInterrupt(FLOW_METER_PIN, measureFlow, RISING);
+#endif
 #endif
 }
 
