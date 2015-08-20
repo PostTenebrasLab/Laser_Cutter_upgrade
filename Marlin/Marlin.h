@@ -156,8 +156,14 @@ void manage_inactivity();
 
 #if defined(E0_ENABLE_PIN) && (E0_ENABLE_PIN > -1)
 #ifdef LASER
+  #define laser_on() enable_e0()
+  #define laser_off() disable_e0()
+
   #define enable_e0() WRITE(E0_ENABLE_PIN, !E_ENABLE_ON)
   #define disable_e0() WRITE(E0_ENABLE_PIN,E_ENABLE_ON)
+
+  #define WRITE_DAC0(X) dacc_write_conversion_data(DACC, (char)X << 4);
+  #define WRITE_DAC1(X) dacc_write_conversion_data(DACC, 0x1 << 12 | (char)X << 4);
 #else
   #define enable_e0() WRITE(E0_ENABLE_PIN, E_ENABLE_ON)
   #define disable_e0() WRITE(E0_ENABLE_PIN,!E_ENABLE_ON)
@@ -183,6 +189,14 @@ void manage_inactivity();
   #define disable_e2() /* nothing */
 #endif
 
+#if defined(RED_DOT_LASER) && (RED_DOT_LASER > -1)
+  #define enable_red_dot() SET_OUTPUT(RED_DOT_LASER)
+  #define disable_red_dot() SET_OUTPUT(RED_DOT_LASER)
+#endif
+#if defined(RED_CROSS_LASER) && (RED_CROSS_LASER > -1)
+  #define enable_red_cross() SET_OUTPUT(RED_CROSS_LASER)
+  #define disable_red_cross() SET_OUTPUT(RED_CROSS_LASER)
+#endif
 
 enum AxisEnum {X_AXIS=0, Y_AXIS=1, Z_AXIS=2, E_AXIS=3};
 

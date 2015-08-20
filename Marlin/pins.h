@@ -51,8 +51,8 @@
 #define Y_MIN_PIN          24
 #define Y_MAX_PIN          38
 
-#define Z_STEP_PIN         32   // original Z wiring use 67, AD13
-#define Z_DIR_PIN          47   // original Z wiring use 66, AD12
+#define Z_STEP_PIN         32   // original Z wiring use 67, AD13, DAC1
+#define Z_DIR_PIN          47   // original Z wiring use 66, AD12, DAC0
 #define Z_ENABLE_PIN       45   // original Z wiring use 44
 #define Z_MIN_PIN          26
 #define Z_MAX_PIN          34
@@ -107,8 +107,10 @@
 
 
 // TODO choose a pin for Due + RAMPS-FD
-#define LASER_INTENSITY_PIN 5 // Digital pins 2, 3, 5, 6, 7, 8 are attached to timers we can use
-#define LASER_FIRING_PIN	2
+//#define LASER_INTENSITY_PIN 5 // Digital pins 2, 3, 5, 6, 7, 8 are attached to timers we can use
+//#define LASER_FIRING_PIN	2
+#define LASER_INTENSITY_PIN     E0_DIR_PIN
+#define LASER_FIRING_PIN    	E0_ENABLE_PIN
 
 #ifdef NUM_SERVOS
 #define SERVO0_PIN         7  // SERVO1

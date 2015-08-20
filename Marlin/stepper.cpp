@@ -550,7 +550,14 @@ HAL_STEP_TIMER_ISR
       }
     }
 
+    // TODO disable for LASER too
     #ifndef ADVANCE
+    #ifdef LASER
+    if (laserArmed) {
+      laser_on();
+
+    }
+    #else
       if ((out_bits & (1<<E_AXIS)) != 0) {  // -direction
         REV_E_DIR();
         count_direction[E_AXIS]=-1;
@@ -559,6 +566,7 @@ HAL_STEP_TIMER_ISR
         NORM_E_DIR();
         count_direction[E_AXIS]=1;
       }
+    #endif  // LASER
     #endif //!ADVANCE
 
 
@@ -728,6 +736,10 @@ HAL_STEP_TIMER_ISR
     if (step_events_completed >= current_block->step_event_count) {
       current_block = NULL;
       plan_discard_current_block();
+      #ifdef LASER
+      laser_off();
+      laserArmed = false;
+      #endif  // LASER
     }
   }
 }
@@ -853,6 +865,7 @@ void st_init()
       if(!Z_ENABLE_ON) WRITE(Z2_ENABLE_PIN,HIGH);
     #endif
   #endif
+  #ifndef LASER
   #if defined(E0_ENABLE_PIN) && (E0_ENABLE_PIN > -1)
     SET_OUTPUT(E0_ENABLE_PIN);
     if(!E_ENABLE_ON) WRITE(E0_ENABLE_PIN,HIGH);
@@ -865,6 +878,30 @@ void st_init()
     SET_OUTPUT(E2_ENABLE_PIN);
     if(!E_ENABLE_ON) WRITE(E2_ENABLE_PIN,HIGH);
   #endif
+  #else
+  /* Reset DACC registers */
+  dacc_reset(DACC);
+  /* Half word transfer mode */
+  dacc_set_power_save(DACC, 0, 0);      // take less time - no need to wake up
+  dacc_disable_trigger(DACC);           // free running mode
+  dacc_set_transfer_mode(DACC, 0);      // 0/1 = 16bit/32bit
+  dacc_disable_channel(DACC, 1);        // E0_DIR_PIN
+  dacc_set_channel_selection(DACC, 0);  // DAC0 = A12 LASER_INTENSITY_PIN
+  dacc_enable_channel(DACC, 0);
+  dacc_write_conversion_data(DACC, 0 << 12 || 0x0 << 4);   // set laserIntensity to 0
+  #if defined(E0_ENABLE_PIN) && (E0_ENABLE_PIN > -1)
+    SET_OUTPUT(E0_ENABLE_PIN);
+  #endif
+  #if defined(RED_DOT_LASER) && (RED_DOT_LASER > -1)
+    SET_OUTPUT(RED_DOT_LASER);
+    disable_red_dot();
+  #endif
+  #if defined(RED_CROSS_LASER) && (RED_CROSS_LASER > -1)
+    SET_OUTPUT(RED_CROSS_LASER);
+    disable_red_cross();
+  #endif
+
+  #endif // not LASER
 
   //endstops and pullups
 

@@ -75,7 +75,7 @@ unsigned char soft_pwm_bed;
 #ifdef LASER
 bool laser_overheat;
 volatile unsigned long lastTime;
-volatile unsigned long frequence = 0;
+volatile unsigned long flowmeter_freq = 0;
 #endif
 
 //===========================================================================
@@ -339,7 +339,7 @@ void updatePID()
 void measureFlow(){
 
   /* weighted average of last measure and new one */
-  frequence = 1000 * (frequence + 1) / (1000 + millis() - lastTime);
+  flowmeter_freq = 1000 * (flowmeter_freq + 1) / (1000 + millis() - lastTime);
   lastTime = millis();
 
 }

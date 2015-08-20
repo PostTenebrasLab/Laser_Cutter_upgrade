@@ -93,6 +93,8 @@
 // M1   - Same as M0
 // M3   - Start firing Laser
 // M5   - Stop firing Laser
+// M6   - Start Z prob red lasers
+// M7   - Stop Z prob red lasers
 // M17  - Enable/Power all stepper motors
 // M18  - Disable all stepper motors; same as M84
 // M20  - List SD card
@@ -291,6 +293,7 @@ int EtoPPressure=0;
 bool laserArmed;
 laser_e laserMode;
 float laserIntensity;
+extern unsigned long flowmeter_freq;
 #endif
 
 bool cancel_heatup = false ;
@@ -556,11 +559,8 @@ void setup()
   #endif
 
   #ifdef LASER
-  pinMode(FLOW_METER_PIN, INPUT);
-  pinMode(RED_DOT_LASER, OUTPUT);
-  pinMode(RED_CROSS_LASER, OUTPUT);
-  WRITE(RED_DOT_LASER,HIGH);
-  WRITE(RED_CROSS_LASER,HIGH);
+  laserMode = CONTINUOUS;
+  laserArmed = true; // UNUSED
   #endif
 
 }
@@ -1224,9 +1224,11 @@ void process_commands()
           #endif //FWRETRACT
 
         #ifdef LASER
-        if (code_seen('S') && !IsStopped()) laserIntensity = (float) code_value();
+        if (code_seen('S') && !IsStopped()) {
+          laserIntensity = ((char) code_value() < LASER_MIN_INTENSITY) ? LASER_MIN_INTENSITY : (char) code_value();
+          WRITE_DAC0(laserIntensity);
+        }
         if (code_seen('B') && !IsStopped()) laserMode = (laser_e) code_value();
-        laserArmed = true;
         #endif // LASER
 
         #ifdef FWRETRACT
@@ -1243,9 +1245,6 @@ void process_commands()
         #endif //FWRETRACT
 
         prepare_move();
-        #ifdef LASER
-        laserArmed = false;
-        #endif
         //ClearToSend();
         return;
       }
@@ -1255,16 +1254,14 @@ void process_commands()
         get_arc_coordinates();
 
         #ifdef LASER
-        if (code_seen('S') && !IsStopped()) laserIntensity = (float) code_value();
+        if (code_seen('S') && !IsStopped()) {
+          laserIntensity = ((char) code_value() < LASER_MIN_INTENSITY) ? LASER_MIN_INTENSITY : (char) code_value();
+          WRITE_DAC0(laserIntensity);
+        }
         if (code_seen('B') && !IsStopped()) laserMode = (laser_e) code_value();
-        laserArmed = true;
         #endif // LASER_FIRE_G1
 
         prepare_arc_move(true);
-
-        #ifdef LASER
-        laserArmed = false;
-        #endif // LASER
 
         return;
       }
@@ -1273,17 +1270,15 @@ void process_commands()
       if(Stopped == false) {
         get_arc_coordinates();
 
-        #ifdef LASER_FIRE_G1
-        if (code_seen('S') && !IsStopped()) laserIntensity = (float) code_value();
+        #ifdef LASER
+        if (code_seen('S') && !IsStopped()) {
+          laserIntensity = ((char) code_value() < LASER_MIN_INTENSITY) ? LASER_MIN_INTENSITY : (char) code_value();
+          WRITE_DAC0(laserIntensity);
+        }
         if (code_seen('B') && !IsStopped()) laserMode = (laser_e) code_value();
-        laserArmed = true;
-        #endif // LASER_FIRE_G1
+        #endif // LASER
 
         prepare_arc_move(false);
-
-        #ifdef LASER
-        laserArmed = false;
-        #endif // LASER
 
         return;
       }
@@ -1904,26 +1899,41 @@ void process_commands()
 #endif
 #ifdef LASER
     case 3:  //M3 - fire laser
-      if (code_seen('S') && !IsStopped()) laserIntensity = (float) code_value();
+      if (code_seen('S') && !IsStopped()) {
+        laserIntensity = ((char) code_value() < LASER_MIN_INTENSITY) ? LASER_MIN_INTENSITY : (char) code_value();
+        WRITE_DAC0(laserIntensity);
+      }
       if (code_seen('B') && !IsStopped()) laserMode = (laser_e) code_value();
-      laserArmed = true;
+      if (laserMode == CONTINUOUS) laser_on();
+      enable_red_dot();
       //lcd_update();
       prepare_move();
       break;
     case 5:  //M5 stop firing laser
-      laserArmed = false;
+      laser_off();
+      disable_red_dot();
 //      lcd_update();
 	  prepare_move();
       break;
+      case 6:  //M6 start red laser
+        enable_red_dot();
+        enable_red_cross();
+        break;
+      case 7:  //M7 stop red laser
+        disable_red_dot();
+        disable_red_cross();
+        break;
 #endif // LASER
     case 17:
         LCD_MESSAGEPGM(MSG_NO_MOVE);
         enable_x();
         enable_y();
         enable_z();
+#ifndef LASER
         enable_e0();
         enable_e1();
         enable_e2();
+#endif
       break;
 
 #ifdef SDSUPPORT
@@ -2116,6 +2126,8 @@ void process_commands()
           SERIAL_PROTOCOLPGM(" /");
           SERIAL_PROTOCOL_F(degTargetHotend(cur_extruder),1);
         }
+        SERIAL_PROTOCOLPGM(" flowmeter: ");
+        SERIAL_PROTOCOL(flowmeter_freq);
 
       #else
         SERIAL_ERROR_START;
@@ -3209,7 +3221,10 @@ void process_commands()
 	#ifdef LASER
 	case 649: // M649 set laser options
 	{
-	  if (code_seen('S') && !IsStopped()) laserIntensity = (float) code_value();
+      if (code_seen('S') && !IsStopped()) {
+        laserIntensity = ((char) code_value() < LASER_MIN_INTENSITY) ? LASER_MIN_INTENSITY : (char) code_value();
+        WRITE_DAC0(laserIntensity);
+      }
       if (code_seen('B') && !IsStopped()) laserMode = (laser_e) code_value();
       if (code_seen('F')) {
         next_feedrate = code_value();
@@ -3641,7 +3656,6 @@ void prepare_move()
 
   // Do not use feedmultiply for E or Z only moves
   if( (current_position[X_AXIS] == destination [X_AXIS]) && (current_position[Y_AXIS] == destination [Y_AXIS])) {
-      laserArmed = false; // avoid in place laser firing
       plan_buffer_line(destination[X_AXIS], destination[Y_AXIS], destination[Z_AXIS], destination[E_AXIS], feedrate/60, active_extruder);
   }
   else {
@@ -3834,10 +3848,6 @@ void kill()
   disable_e1();
   disable_e2();
 
-  #ifdef LASER
-  laserArmed = false;
-  #endif // LASER
-
 #if defined(PS_ON_PIN) && PS_ON_PIN > -1
   pinMode(PS_ON_PIN,INPUT);
 #endif
@@ -3852,8 +3862,7 @@ void Stop()
 {
 
 #ifdef LASER
-  disable_e0();
-  laserArmed = false;
+  laser_off();
 #else
   disable_heater();
 #endif

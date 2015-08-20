@@ -116,6 +116,8 @@
 
 
 #define LASER
+#define LASER_MAX_INTENSITY  255
+#define LASER_MIN_INTENSITY  30
 
 //#define DEBUG_LASER
 
@@ -415,7 +417,7 @@ const bool Z_MAX_ENDSTOP_INVERTING = false; // set to true to invert the logic o
 // Disables axis when it's not being used.
 #define DISABLE_X false
 #define DISABLE_Y false
-#define DISABLE_Z true
+#define DISABLE_Z false
 #define DISABLE_E true // For all extruders
 #define DISABLE_INACTIVE_EXTRUDER true //disable only inactive extruders and keep active extruder enabled
 
