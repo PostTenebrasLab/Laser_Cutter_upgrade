@@ -190,12 +190,12 @@ void manage_inactivity();
 #endif
 
 #if defined(RED_DOT_LASER) && (RED_DOT_LASER > -1)
-  #define enable_red_dot() SET_OUTPUT(RED_DOT_LASER)
-  #define disable_red_dot() SET_OUTPUT(RED_DOT_LASER)
+  #define enable_red_dot() WRITE(RED_DOT_LASER, HIGH)
+  #define disable_red_dot() WRITE(RED_DOT_LASER, LOW)
 #endif
 #if defined(RED_CROSS_LASER) && (RED_CROSS_LASER > -1)
-  #define enable_red_cross() SET_OUTPUT(RED_CROSS_LASER)
-  #define disable_red_cross() SET_OUTPUT(RED_CROSS_LASER)
+  #define enable_red_cross() WRITE(RED_CROSS_LASER, HIGH)
+  #define disable_red_cross() WRITE(RED_CROSS_LASER, LOW)
 #endif
 
 enum AxisEnum {X_AXIS=0, Y_AXIS=1, Z_AXIS=2, E_AXIS=3};

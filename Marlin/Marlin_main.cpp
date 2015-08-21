@@ -57,7 +57,7 @@
 #include "Servo.h"
 #endif
 
-#ifdef LASER_RASTER
+#ifdef LASER
 #include "Base64.h"
 #endif /* LASER_RASTER */
 
@@ -93,8 +93,10 @@
 // M1   - Same as M0
 // M3   - Start firing Laser
 // M5   - Stop firing Laser
-// M6   - Start Z prob red lasers
-// M7   - Stop Z prob red lasers
+// M6   - Start Z prob red dot lasers
+// M7   - Stop Z prob red dot lasers
+// M8   - Start Z prob red cross lasers
+// M9   - Stop Z prob red cross lasers
 // M17  - Enable/Power all stepper motors
 // M18  - Disable all stepper motors; same as M84
 // M20  - List SD card
@@ -293,7 +295,7 @@ int EtoPPressure=0;
 bool laserArmed;
 laser_e laserMode;
 float laserIntensity;
-extern unsigned long flowmeter_freq;
+extern float flowmeter_freq;
 #endif
 
 bool cancel_heatup = false ;
@@ -561,6 +563,8 @@ void setup()
   #ifdef LASER
   laserMode = CONTINUOUS;
   laserArmed = true; // UNUSED
+  disable_red_dot();
+  disable_red_cross();
   #endif
 
 }
@@ -1904,7 +1908,8 @@ void process_commands()
         WRITE_DAC0(laserIntensity);
       }
       if (code_seen('B') && !IsStopped()) laserMode = (laser_e) code_value();
-      if (laserMode == CONTINUOUS) laser_on();
+//      if (laserMode == CONTINUOUS) laser_on();
+      laser_on();
       enable_red_dot();
       //lcd_update();
       prepare_move();
@@ -1917,10 +1922,14 @@ void process_commands()
       break;
       case 6:  //M6 start red laser
         enable_red_dot();
-        enable_red_cross();
         break;
       case 7:  //M7 stop red laser
         disable_red_dot();
+        break;
+      case 8:  //M8 start red laser
+        enable_red_cross();
+        break;
+      case 9:  //M9 stop red laser
         disable_red_cross();
         break;
 #endif // LASER
