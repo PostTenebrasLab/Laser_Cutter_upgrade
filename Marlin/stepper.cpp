@@ -879,13 +879,17 @@ void st_init()
     if(!E_ENABLE_ON) WRITE(E2_ENABLE_PIN,HIGH);
   #endif
   #else
+    pmc_enable_periph_clk(ID_DACC);
   /* Reset DACC registers */
   dacc_reset(DACC);
   /* Half word transfer mode */
 //  dacc_set_power_save(DACC, 0, 0);      // take less time - no need to wake up
   dacc_disable_trigger(DACC);           // free running mode
   dacc_set_transfer_mode(DACC, 0);      // 0/1 = 16bit/32bit
-//  dacc_disable_channel(DACC, 1);        // E0_DIR_PIN
+  dacc_set_power_save(DACC, 0, 0);      // take less time - no need to wake up
+  dacc_set_analog_control(DACC, DACC_ACR_IBCTLCH0(0x02) | DACC_ACR_IBCTLDACCORE(0x01));
+    
+  dacc_disable_channel(DACC, 1);        // E0_DIR_PIN
   dacc_enable_channel(DACC, 0);
   dacc_set_channel_selection(DACC, 0);  // DAC0 = A12 LASER_INTENSITY_PIN
   dacc_write_conversion_data(DACC, 0xF0);   // set laserIntensity to 0
