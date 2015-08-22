@@ -94,6 +94,12 @@ Due utilise 12bits 0..4095)
  * screw it in place
  * decouper et installer le nid-d'abeille
 
+### Docs link
+
+ * http://www.atmel.com/Images/Atmel-11057-32-bit-Cortex-M3-Microcontroller-SAM3X-SAM3A_Datasheet.pdf
+ * http://www.atmel.com/Images/Atmel-42293-SAM4-Digital-to-Analog-Converter-Controller_ApplicationNote_AT07900.pdf
+ * http://udoo.org/download/files/schematics/UDOO_REV_D_schematics.pdf
+
 ### Links
 
 [1] http://reprap.org/wiki/RAMPS-FD
