@@ -117,7 +117,7 @@
 
 #define LASER
 #define LASER_MAX_INTENSITY  255
-#define LASER_MIN_INTENSITY  30
+#define LASER_MIN_INTENSITY  100
 
 //#define DEBUG_LASER
 

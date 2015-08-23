@@ -6,63 +6,44 @@ This project aims to improve a cheap Chinese 40W laser cutter, by making it easi
 
 ### control du Laser
 
-Marlin genere des pulses pour le moteurs. Pour aller d'un endroit à un autre à telle vitesse, il faut à 1KHz envoyer 
-une pulse toute les N ms. Pour chaque axe, la vitesse est différente et les pulses ont des longueurs différentes. 
+Marlin genere des pulses pour le moteurs. Pour aller d'un endroit à un autre à certaine vitesse, il faut à 1KHz envoyer 
+une pulse toute les N ms. Pour chaque axe, la vitesse est différente et les pulses sont plus ou moins espacées. 
 
-Pour le laser on a aussi besoin de pulse. En mode continu, on a besoin d'une pulse d'une durée egale au temps 
-de déplacement, pour le mode pulsé, on veut que le laser pulse à une certaine fréquence. Pour faire un déplacement 
-d = sqrt(dx²+dy²+dz²) il faut un certain temps et donc faire N pulses.
+En mode continu, on utilise les codes 'M3 S???' et 'M5'; M3 = laser on, S100 = laser intensité 100/256, et 
+M5 = laser off.
 
-L'axe E fait ça très bien. Marlin interprète E10 comme devant générer 10 pulses durant ce mouvement.
+En mode Raster, on va réutiliser l'axe E. Avec une résolution de 10 pts par mm, E va être executé 10x/mm et les 
+intensité vont être selectionnées dans un buffer - pour l'instant les accelerations ne sont pas compensées 
+(en passant plus de temps au même endroit quand la vitesse est plus basse).
 
-#### modifications 
-
-Marlin utilise des accelerations et la seul chose à modifier est qu'en accélerant il faut ralentir les pulses 
-(pour qu'elles gardent la même fréquence) et vis et versa.
-
-  * il faut modifier les block dans planner; en mode continu E = 1 && mode pulse E = nb
-  * il faut aussi tenir compte des pulses incompletes dans une succession de block courts ça peut commencer
-    à poser des problèmes d'arrondi . On peut choisir un E > nb de pulse (une résolution 100x plus 
-    grande p.ex 0.32p + 5p + 0.47p) Et donc modifier les pulses p.ex; 32H + 100L + 5x (100H + 100B) + 47H.
-    Il faut aussi gérer les restes p.ex le block suivant 53H + 100L + ...
- 
  
 ### control de temperature (manage_heater())
 
+#### Water cooling pump
+
 Le principe serait de stopper le laser en cas de surchauffe. Il y a deux thermistors une avant le laser (bed) et 
-l'autre après (heater0). Pourquoi pas allumer aussi le ventil du watercooling avec heater_1+term_1 quand la tour est
-chaude ?
+l'autre après (heater0).
 
-HEATER == watercooling pump
-reglage en jouant sur les target_temp du heater
-on peut aussi varier la tension sur la pompe en jouant sur PID_MAX
+La pompe est contrôlée et accélérée en jouant sur PID_MAX en fonction des termistors. 
 
-la pompe peut être gérée comme un heater tant que la target température n'est pas atteinte bang-bang (disable PID). 
-Dès qu'elle est atteinte, on kill()
+##### Water cooling tower fan
 
-On devrait pouvoir modifier facilement le comportement dans température.
+Le fan de la water cooling tower démarre quand la tour est chaude.
+ 
+#### Air pump
+FAN == air pump (mieux vaut disable auto_fan in Configuration_adv.h) reglage avec fanSpeed 
 
-
-FAN == air pump (mieux vaut disable auto_fan in Configuration_adv.h)
-reglage avec fanSpeed 
-
-le fonctionnement de la airpump est proche de celle du FAN gestion par Gcode (M106/107) avec fanSpeed (0..255 attention
-Due utilise 12bits 0..4095)
+le fonctionnement de la airpump est proche de celle du FAN gestion par Gcode (M106/107) avec fanSpeed (0..255)
 
 
 ### Emergency Stop
 
-
+ * install door switch and buton with new alim
   
 ## TODO
 
-### cooling system
-
- * change the pump
-
-### Laser
-
- * check the PWM control of the laser
+ * install an amplification between due output and laser alim
+ * test and improve raster mode
 
 ### Filtration system
 
@@ -74,13 +55,17 @@ Due utilise 12bits 0..4095)
 
  * add flow sensor
  * add two temperature sensors, one in the flow sensor (output of laser) another at laser input
+ * change the water cooling pump
  
 ### Laser
 
+ * ~~Check the PWM control of the laser~~
+ * Laser control intensity use the DAC0 output of SAM3X8E
  * changed lens
  * installed an air flow for the lens
  * installed an air pump
- * installed two red laser for Z probing
+ * installed two red laser for Z probing (one dot and one cross)
+ * Laser alim has been remplaced by a new one
  
 ### controller
 

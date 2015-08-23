@@ -296,6 +296,7 @@ bool laserArmed;
 laser_e laserMode;
 float laserIntensity;
 extern float flowmeter_freq;
+int laserRasterPpm = 4;
 #endif
 
 bool cancel_heatup = false ;
@@ -1210,7 +1211,14 @@ void process_commands()
     switch((int)code_value())
     {
     case 0: // G0 -> G1
-      // TODO add a G0 movement
+      if(Stopped == false) {
+        WRITE_DAC0(0);     // laser intensity to 0 (off)
+        get_coordinates(); // For X Y Z E F
+        prepare_move();
+        WRITE_DAC0(laserIntensity); // set laser intensity to its old value
+        return;
+      }
+      break;
     case 1: // G1
       if(Stopped == false) {
         get_coordinates(); // For X Y Z E F
@@ -1263,7 +1271,7 @@ void process_commands()
           WRITE_DAC0(laserIntensity);
         }
         if (code_seen('B') && !IsStopped()) laserMode = (laser_e) code_value();
-        #endif // LASER_FIRE_G1
+        #endif // LASER
 
         prepare_arc_move(true);
 
@@ -1423,13 +1431,11 @@ void process_commands()
 	  }
 
 	  laser.setPpm(1 / laser.getRasterMmPerPulse); //number of pulses per millimetre
-      // TODO verify
 	  laser.setDuration((1000000*laser.getPpm()) / ( feedrate / 60)); // (1 second in microseconds / (time to move 1mm in microseconds)) / (pulses per mm) = Duration of pulse, taking into account feedrate as speed and ppm
 
 	  laser.setMode(RASTER);
 //	  laser.fireOn();
 	  prepare_move();
-      // TODO is it ok not to turn the laser off after G7 ?
       */
       break;
     #endif // LASER_RASTER
@@ -1916,6 +1922,7 @@ void process_commands()
       break;
     case 5:  //M5 stop firing laser
       laser_off();
+      WRITE_DAC0(0);
       disable_red_dot();
 //      lcd_update();
 	  prepare_move();
@@ -3786,11 +3793,13 @@ void manage_inactivity()
         disable_x();
         disable_y();
         disable_z();
+
+        #ifdef LASER
+        laser_off();
+        #else
         disable_e0();
         disable_e1();
         disable_e2();
-        // TODO do we need to do something here ?
-        #ifdef LASER
         #endif // LASER
       }
     }
@@ -3853,9 +3862,13 @@ void kill()
   disable_x();
   disable_y();
   disable_z();
+  #ifdef LASER
+  laser_off();
+  #else
   disable_e0();
   disable_e1();
   disable_e2();
+  #endif // LASER
 
 #if defined(PS_ON_PIN) && PS_ON_PIN > -1
   pinMode(PS_ON_PIN,INPUT);
